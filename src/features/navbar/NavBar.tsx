@@ -82,12 +82,16 @@ export const NavBar = () => {
             title={
               !isSpeechSupported
                 ? "Speech recognition not supported in this browser"
-                : (status === "stopped" || status === "editing" ? "Start" : "Stop")
+                : (status === "stopped" || status === "editing"
+                    ? "Start teleprompter (keyboard shortcut: P)"
+                    : "Stop teleprompter (keyboard shortcut: P)")
             }
             aria-label={
               !isSpeechSupported
                 ? "Speech recognition not supported"
-                : (status === "stopped" || status === "editing" ? "Start teleprompter" : "Stop teleprompter")
+                : (status === "stopped" || status === "editing"
+                    ? "Start teleprompter, press P key to start"
+                    : "Stop teleprompter, press P key to stop")
             }
           >
             <span className="icon is-small">
@@ -103,7 +107,7 @@ export const NavBar = () => {
           type="button"
           className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
           aria-label="menu"
-          aria-expanded={isMobileMenuOpen}
+          aria-expanded={isMobileMenuOpen ? "true" : "false"}
           onClick={toggleMobileMenu}
         >
           <span aria-hidden="true"></span>
