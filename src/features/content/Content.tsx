@@ -48,30 +48,53 @@ export const Content = () => {
   const containerRef = useRef<null | HTMLDivElement>(null)
   const lastRef = useRef<null | HTMLDivElement>(null)
   const bottomSpacerRef = useRef<null | HTMLDivElement>(null)
+  
+  // Track the highest index we've scrolled to to ensure unidirectional scrolling
+  const maxScrollIndexRef = useRef<number>(-1)
+
+  // Store the last scroll position to ensure we never scroll backward
+  const lastScrollPositionRef = useRef<number>(0);
 
   useEffect(() => {
     if (containerRef.current) {
-      if (lastRef.current) {
-        // Calculate the position to center the current word
-        // We want to position the current word at the scrollOffset distance from the top
-        const elementTop = lastRef.current.offsetTop;
-        const scrollToPosition = elementTop - scrollOffset;
+      // Use the higher of final or interim transcript index
+      const currentTranscriptIndex = Math.max(finalTranscriptIndex, interimTranscriptIndex);
+      
+      // Only scroll forward, never backward
+      // Update the max index we've scrolled to
+      if (currentTranscriptIndex > maxScrollIndexRef.current) {
+        maxScrollIndexRef.current = currentTranscriptIndex;
         
-        // Ensure we don't scroll to negative positions
-        const finalScrollPosition = Math.max(scrollToPosition, 0);
+        // Find the element with the scroll index
+        const targetElement = textElements.find(el => el.index === currentTranscriptIndex + 1);
         
-        containerRef.current.scrollTo({
-          top: finalScrollPosition,
-          behavior: "smooth",
-        })
-      } else {
+        if (targetElement && lastRef.current) {
+          // Calculate the position to center the current word
+          // We want to position the current word at the scrollOffset distance from the top
+          const elementTop = lastRef.current.offsetTop;
+          const scrollToPosition = elementTop - scrollOffset;
+          
+          // Ensure we don't scroll to negative positions
+          const finalScrollPosition = Math.max(scrollToPosition, 0);
+          
+          // Ensure we never scroll backward from our last position
+          const actualScrollPosition = Math.max(finalScrollPosition, lastScrollPositionRef.current);
+          lastScrollPositionRef.current = actualScrollPosition;
+          
+          containerRef.current.scrollTo({
+            top: actualScrollPosition,
+            behavior: "smooth",
+          })
+        }
+      } else if (currentTranscriptIndex < 0 && maxScrollIndexRef.current < 0) {
+        lastScrollPositionRef.current = 0;
         containerRef.current.scrollTo({
           top: 0,
           behavior: "smooth",
         })
       }
     }
-  }, [lastRef, scrollOffset, finalTranscriptIndex, interimTranscriptIndex])
+  }, [lastRef, scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements])
 
   useLayoutEffect(() => {
     if (!containerRef.current || !bottomSpacerRef.current) {
@@ -141,7 +164,7 @@ export const Content = () => {
               <div style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}>
                 {textElements.map((textElement, index, array) => {
                   // Determine which element should have the ref for scrolling
-                  // Use the higher of final or interim transcript index
+                  // Use the current transcript index for the ref
                   const currentTranscriptIndex = Math.max(finalTranscriptIndex, interimTranscriptIndex);
                   const shouldHaveRef = currentTranscriptIndex >= 0 &&
                     textElement.index === currentTranscriptIndex + 1;
@@ -190,7 +213,7 @@ export const Content = () => {
             // Render plain text elements (existing logic)
             textElements.map((textElement, index, array) => {
               // Determine which element should have the ref for scrolling
-              // Use the higher of final or interim transcript index
+              // Use the current transcript index for the ref
               const currentTranscriptIndex = Math.max(finalTranscriptIndex, interimTranscriptIndex);
               const shouldHaveRef = currentTranscriptIndex >= 0 &&
                 textElement.index === currentTranscriptIndex + 1;
