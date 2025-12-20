@@ -118,7 +118,7 @@ export const Content = () => {
                 }
                 style={{
                   display: "inline-block",
-                  margin: "0 2px",
+                  margin: "0 .15rem",
                   cursor: 'pointer',
                 }}
                 {...itemProps}
