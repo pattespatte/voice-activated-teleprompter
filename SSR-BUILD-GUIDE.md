@@ -16,21 +16,25 @@ The SSR build creates a self-contained HTML file that can be opened directly in 
 ### Build Process
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Build the SSR version:
+
    ```bash
    npm run build:ssr
    ```
 
 3. Verify the build:
+
    ```bash
    node test-ssr.mjs
    ```
 
 The build will create a `dist-ssr` directory containing:
+
 - `index.html` - The self-contained application
 - `icon-Dsr8upmd.png` - Application icon
 
@@ -39,6 +43,7 @@ The build will create a `dist-ssr` directory containing:
 ### Direct Usage
 
 1. Open the HTML file in your browser:
+
    ```
    file:///path/to/project/dist-ssr/index.html
    ```
@@ -48,6 +53,7 @@ The build will create a `dist-ssr` directory containing:
 ### Distribution
 
 The `dist-ssr/index.html` file can be:
+
 - Shared with others
 - Hosted on any static file server
 - Opened directly from local storage
@@ -56,6 +62,7 @@ The `dist-ssr/index.html` file can be:
 ## Features and Limitations
 
 ### Features
+
 - ✅ Fully self-contained (no external dependencies)
 - ✅ Works with `file://` protocol
 - ✅ All JavaScript and CSS inlined
@@ -64,6 +71,7 @@ The `dist-ssr/index.html` file can be:
 - ✅ Fallback UI for unsupported browsers
 
 ### Limitations
+
 - ⚠️ Speech recognition only works in supported browsers (Chrome, Edge)
 - ⚠️ Larger file size due to inlined assets (~900KB)
 - ⚠️ No hot-reloading or development features
@@ -71,12 +79,14 @@ The `dist-ssr/index.html` file can be:
 ## Browser Compatibility
 
 ### Supported Features
+
 - Text input and editing
 - Manual scrolling controls
 - Keyboard shortcuts
 - Visual feedback
 
 ### Speech Recognition
+
 - **Full Support**: Chrome, Edge (WebKit-based browsers)
 - **Limited Support**: Safari (may require HTTPS)
 - **No Support**: Firefox (as of current version)
@@ -88,6 +98,7 @@ The application will show appropriate warnings when speech recognition is not av
 ### Build Configuration
 
 The SSR build uses:
+
 - `vite-plugin-singlefile` to inline all assets
 - Custom Vite configuration in `vite.ssr.config.ts`
 - Relative paths (`./`) for file:// protocol compatibility
@@ -105,6 +116,7 @@ The SSR build uses:
 ### Build Issues
 
 1. **Dependencies not found**:
+
    ```bash
    npm install
    ```
@@ -112,6 +124,7 @@ The SSR build uses:
 2. **Build fails**:
    - Check Node.js version (v16+ required)
    - Clear node_modules and reinstall:
+
      ```bash
      rm -rf node_modules package-lock.json
      npm install
@@ -131,7 +144,7 @@ The SSR build uses:
 ## Development vs. SSR Build
 
 | Feature | Development Build | SSR Build |
-|---------|------------------|------------|
+|---------|-------------------|-----------|
 | Server Required | Yes (npm run dev) | No |
 | Hot Reload | Yes | No |
 | File Size | Small (split chunks) | Large (single file) |
@@ -144,15 +157,18 @@ When making changes that affect the SSR build:
 
 1. Test with development server first
 2. Build SSR version and validate:
+
    ```bash
    npm run build:ssr && node test-ssr.mjs
    ```
+
 3. Test the SSR build in different browsers
 4. Verify file:// protocol compatibility
 
 ## Automation
 
 The `test-ssr.mjs` script validates:
+
 - JavaScript and CSS inlining
 - Relative path usage
 - Speech recognition fallback implementation

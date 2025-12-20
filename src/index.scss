@@ -1,5 +1,4 @@
-@use "bulma" with (
-  $grey-darker: hsl(221, 14%, 21%),
+@use "bulma" with ($grey-darker: hsl(221, 14%, 21%),
   $black: hsl(221, 14%, 4%),
   $white: hsl(221, 14%, 100%),
   $grey: hsl(221, 14%, 48%),
@@ -10,8 +9,7 @@
   $red: hsl(348, 100%, 70%),
   $yellow: hsl(42, 100%, 53%),
   $green: hsl(153, 53%, 53%),
-  $cyan: hsl(198, 100%, 70%)
-);
+  $cyan: hsl(198, 100%, 70%));
 
 $button-disabled-background-color: hsl(0, 0%, 4%);
 $button-disabled-opacity: 0.2;
@@ -87,25 +85,6 @@ body {
 .button:hover {
   border-color: bulma.$grey;
   color: bulma.$grey;
-}
-
-.fa-play {
-  color: bulma.$green;
-}
-
-.fa-stop {
-  color: bulma.$red;
-}
-
-.fa-up-down,
-.fa-left-right {
-  color: bulma.$grey;
-}
-
-.editing .fa-pencil,
-.vertically-flipped .fa-up-down,
-.horizontally-flipped .fa-left-right {
-  color: bulma.$yellow;
 }
 
 .slider>span {
@@ -283,21 +262,21 @@ div.content {
   .navbar-burger {
     display: flex !important;
   }
-  
+
   /* Ensure navbar content stays aligned to top */
   .navbar {
     align-items: flex-start !important;
   }
-  
+
   .navbar-brand {
     align-items: flex-start !important;
   }
-  
+
   .navbar-menu {
     align-items: flex-start !important;
     padding-top: 0.5rem;
   }
-  
+
   .navbar-end {
     align-items: flex-start !important;
   }
@@ -306,7 +285,7 @@ div.content {
 /* Ensure navbar menu toggles properly on all screen sizes */
 .navbar-menu {
   transition: display 0.3s ease-in-out;
-  
+
   &:not(.is-active) {
     /* Debug: Change from display:none to visibility:hidden to maintain layout */
     /* display: none; */
