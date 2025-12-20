@@ -121,7 +121,9 @@ export default class SpeechRecognizer {
 
   start(): void {
     if (!this.isSupported || !this.recognizer) {
-      console.warn('Speech recognition is not supported in this browser')
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Speech recognition is not supported in this browser')
+      }
       return
     }
     this.shouldListen = true

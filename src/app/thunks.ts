@@ -17,7 +17,9 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
 
   // Check if speech recognition is supported
   if (!speechRecognizer.getIsSupported()) {
-    console.warn('Speech recognition is not supported in this browser. The teleprompter will work in manual mode only.')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Speech recognition is not supported in this browser. The teleprompter will work in manual mode only.')
+    }
     return
   }
 

@@ -58,11 +58,14 @@ export const NavBar = () => {
     const reader = new FileReader()
     reader.onload = (e) => {
       const content = e.target?.result as string
-      dispatch(setContent(content))
+      const isMarkdown = file.name.toLowerCase().endsWith('.md')
+      dispatch(setContent({ content, isMarkdown }))
       dispatch(resetTranscriptionIndices())
     }
     reader.onerror = () => {
-      console.error("Error reading file")
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error reading file")
+      }
     }
     reader.readAsText(file, "UTF-8")
 
@@ -262,7 +265,7 @@ export const NavBar = () => {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".txt,text/plain"
+                  accept=".txt,text/plain,.md,text/markdown"
                   onChange={handleFileUpload}
                   style={{ display: "none" }}
                   aria-hidden="true"

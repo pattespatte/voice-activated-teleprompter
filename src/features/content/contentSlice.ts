@@ -1,6 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "../../app/createAppSlice"
 import { type TextElement, tokenize } from "../../lib/word-tokenizer"
+import { isMarkdownContent, markdownToHtmlSync, stripMarkdown } from "../../lib/markdown-processor"
 import { toggleEdit, SUPPORTED_LOCALES } from "../navbar/navbarSlice"
 
 export interface ContentSliceState {
@@ -8,6 +9,8 @@ export interface ContentSliceState {
   textElements: TextElement[]
   finalTranscriptIndex: number
   interimTranscriptIndex: number
+  isMarkdown: boolean
+  processedHtml: string
 }
 
 // Translations for the initial text in all supported languages
@@ -47,6 +50,8 @@ const initialState: ContentSliceState = {
   textElements: tokenize(initialText),
   finalTranscriptIndex: -1,
   interimTranscriptIndex: -1,
+  isMarkdown: false,
+  processedHtml: "",
 }
 
 export const contentSlice = createAppSlice({
@@ -57,9 +62,30 @@ export const contentSlice = createAppSlice({
 
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: create => ({
-    setContent: create.reducer((state, action: PayloadAction<string>) => {
-      state.rawText = action.payload
-      state.textElements = tokenize(action.payload)
+    setContent: create.reducer((state, action: PayloadAction<{ content: string; isMarkdown?: boolean } | string>) => {
+      let content: string
+      let isMarkdownFile = false
+      
+      if (typeof action.payload === 'string') {
+        content = action.payload
+        isMarkdownFile = isMarkdownContent(content)
+      } else {
+        content = action.payload.content
+        isMarkdownFile = action.payload.isMarkdown ?? isMarkdownContent(content)
+      }
+      
+      state.rawText = content
+      state.isMarkdown = isMarkdownFile
+      
+      if (isMarkdownFile) {
+        state.processedHtml = markdownToHtmlSync(content)
+        const plainText = stripMarkdown(content)
+        state.textElements = tokenize(plainText)
+      } else {
+        state.processedHtml = ""
+        state.textElements = tokenize(content)
+      }
+      
       state.finalTranscriptIndex = -1
       state.interimTranscriptIndex = -1
     }),
@@ -102,7 +128,12 @@ export const contentSlice = createAppSlice({
 
   extraReducers: builder =>
     builder.addCase(toggleEdit, state => {
-      state.textElements = tokenize(state.rawText)
+      if (state.isMarkdown) {
+        const plainText = stripMarkdown(state.rawText)
+        state.textElements = tokenize(plainText)
+      } else {
+        state.textElements = tokenize(state.rawText)
+      }
     }),
 
   selectors: {
@@ -110,6 +141,8 @@ export const contentSlice = createAppSlice({
     selectTextElements: state => state.textElements,
     selectFinalTranscriptIndex: state => state.finalTranscriptIndex,
     selectInterimTranscriptIndex: state => state.interimTranscriptIndex,
+    selectIsMarkdown: state => state.isMarkdown,
+    selectProcessedHtml: state => state.processedHtml,
   },
 })
 
@@ -126,4 +159,6 @@ export const {
   selectTextElements,
   selectFinalTranscriptIndex,
   selectInterimTranscriptIndex,
+  selectIsMarkdown,
+  selectProcessedHtml,
 } = contentSlice.selectors
