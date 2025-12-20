@@ -118,7 +118,13 @@ export const Content = () => {
                 }
                 style={{
                   display: textElement.value.includes('\n') ? "inline" : "inline-block",
-                  margin: "0 .15rem",
+                  margin: (() => {
+                    if (textElement.value.includes('\n')) return "0";
+                    if (textElement.type === "TOKEN") return "0 .25rem";
+                    if (textElement.value === ' "') return "0 -.25rem 0 .25rem"; // Small margin for spaces
+                    if (textElement.value === '" ') return "0 .25rem 0 -.25rem"; // Small margin for spaces
+                    return "0"; // No margin for punctuation and quotes
+                  })(),
                   cursor: 'pointer',
                 }}
                 {...itemProps}
