@@ -3,16 +3,88 @@ type SubscriberFunction = (
   interim_transcript: string,
 ) => void
 
+// Type declaration for Web Speech API
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  grammars: SpeechGrammarList;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  serviceURI: string;
+  onaudioend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onaudiostart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
+  onnomatch: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onsoundend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onsoundstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onspeechend: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onspeechstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  onstart: ((this: SpeechRecognition, ev: Event) => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message?: string;
+}
+
+interface SpeechGrammarList {
+  length: number;
+  addFromString(string: string, weight?: number): void;
+  addFromURI(src: string, weight?: number): void;
+  item(index: number): SpeechGrammar;
+  [index: number]: SpeechGrammar;
+}
+
+interface SpeechGrammar {
+  src: string;
+  weight: number;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
 export default class SpeechRecognizer {
   private recognizer: SpeechRecognition | null = null
   private subscribers: SubscriberFunction[] = []
-  private shouldListen: Boolean = false
-  private isSupported: Boolean = false
+  private shouldListen: boolean = false
+  private isSupported: boolean = false
 
   constructor(language: string = "en-US") {
     // Check if Web Speech API is supported
     if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      this.recognizer = new (window as any).webkitSpeechRecognition()
+      this.recognizer = new (window as unknown as { webkitSpeechRecognition: new () => SpeechRecognition }).webkitSpeechRecognition()
       this.isSupported = true
 
       this.recognizer!.lang = language
@@ -82,7 +154,7 @@ export default class SpeechRecognizer {
     }
   }
 
-  getIsSupported(): Boolean {
+  getIsSupported(): boolean {
     return this.isSupported
   }
 }

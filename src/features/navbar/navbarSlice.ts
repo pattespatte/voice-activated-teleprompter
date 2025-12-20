@@ -28,7 +28,7 @@ const detectLanguage = (): string => {
     return savedLanguage
   }
 
-  if (SUPPORTED_LOCALES.hasOwnProperty(navigator.language)) {
+  if (Object.prototype.hasOwnProperty.call(SUPPORTED_LOCALES, navigator.language)) {
     return navigator.language
   }
 

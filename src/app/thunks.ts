@@ -26,7 +26,6 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
       const {
         textElements,
         finalTranscriptIndex: lastFinalTranscriptIndex,
-        interimTranscriptIndex: lastInterimTranscriptIndex,
       } = getState().content
 
       if (final_transcript !== "") {
@@ -61,7 +60,7 @@ export const stopTeleprompter = (): AppThunk => dispatch => {
   dispatch(stop())
 }
 
-export const changeLanguage = (language: string): AppThunk => dispatch => {
+export const changeLanguage = (language: string): AppThunk => () => {
   if (speechRecognizer !== null) {
     speechRecognizer.setLanguage(language)
   }

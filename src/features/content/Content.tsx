@@ -117,6 +117,8 @@ export const Content = () => {
                       : "has-text-white"
                 }
                 style={{
+                  display: "inline-block",
+                  margin: "0 2px",
                   cursor: 'pointer',
                 }}
                 {...itemProps}
