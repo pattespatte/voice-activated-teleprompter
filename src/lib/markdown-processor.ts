@@ -72,28 +72,32 @@ const processChords = (content: string): string => {
  */
 export const stripMarkdown = (content: string): string => {
   return content
-    // Remove chords [G], [C], etc.
+    // Remove chords like [G], [C], [G7], [Am], [F#m], etc. completely
     .replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g, '')
     // Remove metadata like [**Key:** G Major] and [**Time:** 3/4 (Waltz)]
     .replace(/\[\*\*Key:\*\*.*?\]/g, '')
     .replace(/\[\*\*Time:\*\*.*?\]/g, '')
-    // Remove headers (# ## ### etc.)
+    // Remove other metadata in brackets [**...**]
+    .replace(/\[\*\*.*?\*\*.*?\]/g, '')
+    // Remove headers (# ## ### etc.) but keep the content
     .replace(/^#{1,6}\s+/gm, '')
-    // Remove bold (**text**)
+    // Remove bold (**text**) but keep the text content
     .replace(/\*\*(.*?)\*\*/g, '$1')
-    // Remove italic (*text* or _text_)
+    // Remove italic (*text*) but keep the text content
     .replace(/\*(.*?)\*/g, '$1')
+    // Remove italic with underscores (_text_) but keep the text content
     .replace(/_(.*?)_/g, '$1')
-    // Remove inline code (`code`)
+    // Remove inline code (`code`) but keep the content
     .replace(/`(.*?)`/g, '$1')
     // Remove links [text](url) -> text
     .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-    // Remove list markers
+    // Remove list markers (-, *, +) but keep the content
     .replace(/^\s*[-*+]\s+/gm, '')
+    // Remove ordered list markers (1., 2., etc.) but keep the content
     .replace(/^\s*\d+\.\s+/gm, '')
-    // Remove blockquotes
+    // Remove blockquotes (>) but keep the content
     .replace(/^>\s+/gm, '')
-    // Remove extra line breaks
+    // Remove extra whitespace and normalize line breaks
     .replace(/\n\s*\n/g, '\n')
     .trim()
 }
