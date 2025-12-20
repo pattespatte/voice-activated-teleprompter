@@ -19,6 +19,7 @@ export const SUPPORTED_LOCALES = {
   "it-IT": "🇮🇹 Italian (Italy)",
   "pt-BR": "🇧🇷 Portuguese (Brazil)",
   "es-ES": "🇪🇸 Spanish (Spain)",
+  "sv-SE": "🇸🇪 Swedish (Sweden)",
 }
 
 // Detect browser language and default to pt-BR if Portuguese, otherwise en-US
