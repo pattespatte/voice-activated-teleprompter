@@ -189,7 +189,7 @@ export const NavBar = () => {
                   aria-label="Edit text"
                 >
                   <span className="icon is-small">
-                    <i className="fa-solid fa-pencil" />
+                    <span className="fa-solid fa-pencil" />
                   </span>
                   <span className="is-sr-only">Edit</span>
                 </button>
@@ -201,7 +201,7 @@ export const NavBar = () => {
                   aria-label="Flip text horizontally"
                 >
                   <span className="icon is-small">
-                    <i className="fa-solid fa-left-right" />
+                    <span className="fa-solid fa-left-right" />
                   </span>
                   <span className="is-sr-only">Flip Horizontal</span>
                 </button>
@@ -213,7 +213,7 @@ export const NavBar = () => {
                   aria-label="Flip text vertically"
                 >
                   <span className="icon is-small">
-                    <i className="fa-solid fa-up-down" />
+                    <span className="fa-solid fa-up-down" />
                   </span>
                   <span className="is-sr-only">Flip Vertical</span>
                 </button>
@@ -225,7 +225,7 @@ export const NavBar = () => {
                   aria-label="Restart from beginning"
                 >
                   <span className="icon is-small">
-                    <i className="fa-solid fa-arrows-rotate" />
+                    <span className="fa-solid fa-arrows-rotate" />
                   </span>
                   <span className="is-sr-only">Restart</span>
                 </button>
@@ -252,7 +252,7 @@ export const NavBar = () => {
               }
             >
               <span className="icon is-small">
-                <i
+                <span
                   className={`fa-solid ${!isSpeechSupported ? "fa-exclamation-triangle" : (status === "stopped" || status === "editing" ? "fa-play" : "fa-stop")}`}
                 />
               </span>
