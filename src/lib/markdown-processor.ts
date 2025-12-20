@@ -74,6 +74,9 @@ export const stripMarkdown = (content: string): string => {
   return content
     // Remove chords [G], [C], etc.
     .replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g, '')
+    // Remove metadata like [**Key:** G Major] and [**Time:** 3/4 (Waltz)]
+    .replace(/\[\*\*Key:\*\*.*?\]/g, '')
+    .replace(/\[\*\*Time:\*\*.*?\]/g, '')
     // Remove headers (# ## ### etc.)
     .replace(/^#{1,6}\s+/gm, '')
     // Remove bold (**text**)

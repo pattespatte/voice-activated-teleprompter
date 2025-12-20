@@ -1,45 +1,59 @@
 # Amazing Grace
 
-*(Public Domain)*
+[**Key:** G Major]
+[**Time:** 3/4 (Waltz)]
 
-G                G7        C          G
-Amazing grace, how sweet the sound
-                          D
-That saved a wretch like me
-G              G7       C        G
-I once was lost, but now am found
-              D        G
-Was blind but now I see
+## Verse 1
 
----
+[G]                  [G7]
+Amazing grace! How sweet the sound
+[C]                   [G]
+That saved a wretch like me!
+[G]                       [D]    [D7]
+I once was lost, but now am found;
+[G]         [G7]       [C]      [G]
+Was blind, but now I see.
 
-G                G7        C          G
-'Twas grace that taught my heart to fear
-                          D
-And grace my fears relieved
-G              G7       C        G
+## Verse 2
+
+[G]                     [G7]
+'Twas grace that taught my heart to fear,
+[C]               [G]
+And grace my fears relieved;
+[G]                       [D]    [D7]
 How precious did that grace appear
-              D        G
-The hour I first believed
+[G]     [G7]     [C]         [G]
+The hour I first believed.
 
----
+## Verse 3
 
-G            G         C       G
+[G]                [G7]
+The Lord has promised good to me,
+[C]               [G]
+His word my hope secures;
+[G]        [G7]         [C]       [G]
+He will my shield and portion be
+[Em]      [D7]      [G]
+As long as life endures.
+
+## Verse 4
+
+[G]                  [G7]
 Through many dangers, toils and snares,
-G          G        D
+[C]                [G]
 I have already come;
-G            G           C      G
+[G]         [G7]          [C]          [G]
 'Tis grace hath brought me safe thus far,
-G          D       G
+[Em]         [D7]       [G]
 And grace will lead me home.
 
----
+## Verse 5
 
-G              G        C      G
+[G]                   [G7]
 When we've been there ten thousand years,
-G           G        D
+[C]                   [G]
 Bright shining as the sun,
-G            G         C       G
+[G]       [G7]      [C]          [G]
 We've no less days to sing God's praise
-G          D        G
-Than when we first begun.
+[Em]        [D7]        [G]
+Than when we'd first begun.
