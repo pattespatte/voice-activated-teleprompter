@@ -1,0 +1,479 @@
+@charset "utf-8";
+
+$button-disabled-background-color: hsl(0, 0%, 4%);
+$button-disabled-opacity: 0.2;
+
+@use "bulma";
+
+html,
+body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Layout */
+
+.navbar {
+  flex-shrink: 0;
+  border-bottom: 1px solid bulma.$grey-darker;
+}
+
+.navbar-menu {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-end {
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.content-area {
+  height: 100%;
+}
+
+/* NavBar styles */
+
+.navbar .title {
+  font-size: 2em;
+}
+
+.button,
+.button:focus {
+  background-color: bulma.$black;
+  border-color: bulma.$grey-dark;
+  color: bulma.$grey-dark;
+}
+
+.button:hover {
+  border-color: bulma.$grey;
+  color: bulma.$grey;
+}
+
+.fa-play {
+  color: bulma.$green;
+}
+
+.fa-stop {
+  color: bulma.$red;
+}
+
+.fa-up-down,
+.fa-left-right {
+  color: bulma.$grey;
+}
+
+.editing .fa-pencil,
+.vertically-flipped .fa-up-down,
+.horizontally-flipped .fa-left-right {
+  color: bulma.$yellow;
+}
+
+.slider>span {
+  margin-right: 0.5em;
+  color: bulma.$grey-light;
+}
+
+.buttons .dropdown {
+  margin-right: 0.5rem;
+}
+
+input[type="range"] {
+  width: 80px;
+}
+
+.navbar-brand ul {
+  margin-top: 0.3em;
+}
+
+.navbar-brand li {
+  float: left;
+  padding: 0 0.5em;
+  border-right: 1px solid bulma.$grey;
+}
+
+.navbar-brand li.last {
+  border: none;
+}
+
+.navbar-brand li a {
+  color: bulma.$cyan;
+  text-decoration: underline;
+}
+
+/* Content styles */
+
+.content {
+  overflow: auto;
+  background-color: bulma.$black;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  color: bulma.$white;
+  padding: 0;
+  line-height: inherit;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.content:focus {
+  outline: none;
+}
+
+div.content {
+  cursor: default;
+}
+
+.final-transcript {
+  color: bulma.$grey-darker;
+}
+
+.interim-transcript {
+  color: bulma.$yellow;
+}
+
+.content>span:hover {
+  color: bulma.$red;
+}
+
+/* Responsive styles */
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    .title {
+      font-size: 1.2em;
+    }
+
+    .navbar-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: bulma.$black;
+      border-top: 1px solid bulma.$grey-darker;
+      flex-direction: column;
+      align-items: stretch;
+
+      &.is-active {
+        display: flex;
+      }
+
+      &:not(.is-active) {
+        display: none;
+      }
+    }
+
+    .navbar-end {
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+
+      .navbar-item {
+        width: 100%;
+
+        &.slider {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
+
+          .slider-label {
+            margin-bottom: 0.5rem;
+            font-size: 0.9em;
+          }
+
+          input[type="range"] {
+            width: 100%;
+            height: 8px;
+          }
+        }
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+
+        .button {
+          flex: 1;
+          min-width: 60px;
+          height: 50px;
+          font-size: 1.2em;
+        }
+      }
+
+      .field {
+        width: 100%;
+
+        .control {
+          width: 100%;
+
+          .select {
+            width: 100%;
+
+            select {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .content-area {
+    height: calc(100vh - 60px);
+  }
+
+  .content {
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 0.5rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    .navbar-end {
+      padding: 0.5rem;
+
+      .buttons .button {
+        min-width: 50px;
+        height: 45px;
+        font-size: 1em;
+      }
+    }
+  }
+
+  .content {
+    font-size: 14px;
+    padding: 0.25rem;
+  }
+}
+
+/* Touch-friendly improvements */
+.button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+input[type="range"] {
+  height: 6px;
+  cursor: pointer;
+}
+
+@media (hover: none) {
+  .button:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+  }
+}
+
+/* Mobile viewport adjustments */
+@media screen and (max-height: 600px) {
+  .navbar {
+    .navbar-menu {
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+  }
+}
+
+/* Improved mobile content styles */
+@media screen and (max-width: 768px) {
+  .content {
+    padding: 1rem;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+
+    >span {
+      display: inline-block;
+      margin: 0.15em 0.05em;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: scale(1.1);
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .final-transcript {
+    color: bulma.$grey-darker;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .interim-transcript {
+    color: bulma.$yellow;
+    background-color: rgba(255, 255, 0, 0.1);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .content {
+    padding: 0.75rem;
+
+    >span {
+      margin: 0.1em 0.02em;
+      font-size: 0.95em;
+    }
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .content {
+    >span {
+      min-height: 1.5rem;
+      min-width: .5rem;
+      position: relative;
+
+      &:hover {
+        color: bulma.$red;
+        background-color: rgba(255, 0, 0, 0.1);
+      }
+    }
+  }
+
+  textarea.content {
+    font-size: 16px;
+    /* Prevents zoom on iOS */
+    line-height: 1.5;
+    padding: 0.75rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .content {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .navbar {
+    .navbar-brand {
+      .title {
+        font-size: 1em;
+
+        div {
+          line-height: 1.2;
+        }
+      }
+    }
+  }
+
+  .content-area {
+    height: calc(100vh - 50px);
+  }
+}
+
+/* Accessibility improvements */
+.is-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus indicators for better accessibility */
+.button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid bulma.$cyan;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navbar {
+    border-bottom: 2px solid bulma.$white;
+  }
+
+  .button {
+    border: 2px solid bulma.$grey-light;
+  }
+
+  .content>span {
+    border: 1px solid transparent;
+
+    &:hover {
+      border-color: bulma.$white;
+    }
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+  }
+}
+
+/* Mobile-specific accessibility */
+@media screen and (max-width: 768px) {
+  .button {
+    &:focus {
+      outline: 3px solid bulma.$cyan;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .navbar-item.slider {
+    input[type="range"] {
+      &:focus {
+        outline: 2px solid bulma.$cyan;
+        outline-offset: 2px;
+      }
+
+      &::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: bulma.$cyan;
+        cursor: pointer;
+        border: 2px solid bulma.$white;
+      }
+
+      &::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: bulma.$cyan;
+        cursor: pointer;
+        border: 2px solid bulma.$white;
+      }
+    }
+  }
+}
