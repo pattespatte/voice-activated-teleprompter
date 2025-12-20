@@ -37,7 +37,7 @@ body {
 }
 
 .navbar-menu {
-  flex: 1;
+  flex: auto;
   display: flex;
   align-items: center;
 }
@@ -252,6 +252,36 @@ div.content {
     font-size: 16px;
     line-height: 1.5;
     padding: 0.5rem;
+  }
+}
+
+/* Show hamburger menu on tablet and mobile screens */
+@media screen and (max-width: 1023px) {
+  .navbar-burger {
+    display: flex !important;
+  }
+}
+
+/* Keep hamburger menu visible on larger screens */
+@media screen and (min-width: 1024px) {
+  .navbar-burger {
+    display: flex !important;
+  }
+}
+
+/* Ensure navbar menu toggles properly on all screen sizes */
+.navbar-menu {
+  transition: display 0.3s ease-in-out;
+  
+  &:not(.is-active) {
+    display: none;
+  }
+}
+
+/* Show hamburger menu on tablet and mobile screens */
+@media screen and (max-width: 1023px) {
+  .navbar-burger {
+    display: flex !important;
   }
 }
 
