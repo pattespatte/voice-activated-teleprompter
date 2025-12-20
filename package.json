@@ -18,8 +18,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",
-    "bulma-extensions": "^6.2.7",
-    "bulma-slider": "^2.0.5",
     "html-escaper": "^3.0.3",
     "i": "^0.3.7",
     "npm": "^11.6.1",
