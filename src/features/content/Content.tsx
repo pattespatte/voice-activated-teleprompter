@@ -117,7 +117,7 @@ export const Content = () => {
                       : "has-text-white"
                 }
                 style={{
-                  display: "inline-block",
+                  display: textElement.value.includes('\n') ? "inline" : "inline-block",
                   margin: "0 .15rem",
                   cursor: 'pointer',
                 }}
