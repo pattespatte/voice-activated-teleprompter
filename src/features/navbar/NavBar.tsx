@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
 import { startTeleprompter, stopTeleprompter, changeLanguage } from "../../app/thunks"
@@ -6,16 +6,16 @@ import SpeechRecognizer from "../../lib/speech-recognizer"
 
 import {
   toggleEdit,
-  flipHorizontally,
-  flipVertically,
+  // flipHorizontally,
+  // flipVertically,
   setFontSize,
   setMargin,
   setOpacity,
   setScrollOffset,
   setLanguage,
   selectStatus,
-  selectHorizontallyFlipped,
-  selectVerticallyFlipped,
+  // selectHorizontallyFlipped,
+  // selectVerticallyFlipped,
   selectFontSize,
   selectMargin,
   selectOpacity,
@@ -24,20 +24,21 @@ import {
   SUPPORTED_LOCALES,
 } from "./navbarSlice"
 
-import { resetTranscriptionIndices, updateInitialTextForLanguage } from "../content/contentSlice"
+import { resetTranscriptionIndices, updateInitialTextForLanguage, setContent } from "../content/contentSlice"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSpeechSupported, setIsSpeechSupported] = useState(true)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const status = useAppSelector(selectStatus)
   const fontSize = useAppSelector(selectFontSize)
   const margin = useAppSelector(selectMargin)
   const opacity = useAppSelector(selectOpacity)
   const scrollOffset = useAppSelector(selectScrollOffset)
-  const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
-  const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
+  // const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
+  // const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const language = useAppSelector(selectLanguage)
 
   useEffect(() => {
@@ -48,6 +49,27 @@ export const NavBar = () => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const content = e.target?.result as string
+      dispatch(setContent(content))
+      dispatch(resetTranscriptionIndices())
+    }
+    reader.onerror = () => {
+      console.error("Error reading file")
+    }
+    reader.readAsText(file, "UTF-8")
+
+    // Reset the input value to allow uploading the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
   return (
@@ -107,7 +129,7 @@ export const NavBar = () => {
           type="button"
           className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
           aria-label="menu"
-          aria-expanded={isMobileMenuOpen ? "true" : "false"}
+          aria-expanded={isMobileMenuOpen}
           onClick={toggleMobileMenu}
         >
           <span aria-hidden="true"></span>
@@ -228,6 +250,28 @@ export const NavBar = () => {
                   <span className="is-sr-only">Edit</span>
                 </button>
                 <button
+                  className="button"
+                  disabled={status !== "stopped"}
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Upload text file"
+                  aria-label="Upload text file"
+                >
+                  <span className="icon is-small">
+                    <span className="fa-solid fa-upload"></span>
+                  </span>
+                  <span className="is-sr-only">Upload</span>
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt,text/plain"
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                />
+                {/* Flip buttons commented out as they are not needed */}
+                {/* <button
                   className={`button ${horizontallyFlipped ? "horizontally-flipped" : ""}`}
                   disabled={status !== "stopped"}
                   onClick={() => dispatch(flipHorizontally())}
@@ -250,7 +294,7 @@ export const NavBar = () => {
                     <span className="fa-solid fa-up-down" />
                   </span>
                   <span className="is-sr-only">Flip Vertical</span>
-                </button>
+                </button> */}
                 <button
                   className="button"
                   disabled={status !== "stopped"}

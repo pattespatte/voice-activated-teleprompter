@@ -59,6 +59,7 @@ export const contentSlice = createAppSlice({
   reducers: create => ({
     setContent: create.reducer((state, action: PayloadAction<string>) => {
       state.rawText = action.payload
+      state.textElements = tokenize(action.payload)
       state.finalTranscriptIndex = -1
       state.interimTranscriptIndex = -1
     }),
