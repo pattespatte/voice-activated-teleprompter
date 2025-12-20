@@ -11,6 +11,14 @@ export default defineConfig({
       inlinePattern: [],
     }),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        verbose: true,
+        quietDeps: true,
+      },
+    },
+  },
   build: {
     rollupOptions: {
       output: {
