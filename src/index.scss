@@ -34,12 +34,16 @@ body {
 .navbar {
   flex-shrink: 0;
   border-bottom: 1px solid bulma.$grey-darker;
+  /* Debug: Add background to visualize layout */
+  /* background-color: rgba(255, 0, 0, 0.1); */
 }
 
 .navbar-menu {
   flex: auto;
   display: flex;
   align-items: center;
+  /* Debug: Add background to visualize layout */
+  /* background-color: rgba(0, 255, 0, 0.1); */
 }
 
 .navbar-end {
@@ -48,6 +52,19 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.navbar-brand {
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Ensure hamburger menu stays in place */
+.navbar-burger {
+  position: relative;
+  flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
 }
 
 .content-area {
@@ -267,6 +284,24 @@ div.content {
   .navbar-burger {
     display: flex !important;
   }
+  
+  /* Ensure navbar content stays aligned to top */
+  .navbar {
+    align-items: flex-start !important;
+  }
+  
+  .navbar-brand {
+    align-items: flex-start !important;
+  }
+  
+  .navbar-menu {
+    align-items: flex-start !important;
+    padding-top: 0.5rem;
+  }
+  
+  .navbar-end {
+    align-items: flex-start !important;
+  }
 }
 
 /* Ensure navbar menu toggles properly on all screen sizes */
@@ -274,7 +309,12 @@ div.content {
   transition: display 0.3s ease-in-out;
   
   &:not(.is-active) {
-    display: none;
+    /* Debug: Change from display:none to visibility:hidden to maintain layout */
+    /* display: none; */
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
   }
 }
 
