@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
 import { startTeleprompter, stopTeleprompter, changeLanguage } from "../../app/thunks"
+import SpeechRecognizer from "../../lib/speech-recognizer"
 
 import {
   toggleEdit,
@@ -28,6 +29,7 @@ import { resetTranscriptionIndices } from "../content/contentSlice"
 export const NavBar = () => {
   const dispatch = useAppDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSpeechSupported, setIsSpeechSupported] = useState(true)
 
   const status = useAppSelector(selectStatus)
   const fontSize = useAppSelector(selectFontSize)
@@ -37,6 +39,12 @@ export const NavBar = () => {
   const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
   const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const language = useAppSelector(selectLanguage)
+
+  useEffect(() => {
+    // Check if speech recognition is supported
+    const recognizer = new SpeechRecognizer()
+    setIsSpeechSupported(Boolean(recognizer.getIsSupported()))
+  }, [])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -233,19 +241,23 @@ export const NavBar = () => {
                 )
               }
               title={
-                status === "stopped" || status === "editing" ? "Start" : "Stop"
+                !isSpeechSupported
+                  ? "Speech recognition not supported in this browser"
+                  : (status === "stopped" || status === "editing" ? "Start" : "Stop")
               }
               aria-label={
-                status === "stopped" || status === "editing" ? "Start teleprompter" : "Stop teleprompter"
+                !isSpeechSupported
+                  ? "Speech recognition not supported"
+                  : (status === "stopped" || status === "editing" ? "Start teleprompter" : "Stop teleprompter")
               }
             >
               <span className="icon is-small">
                 <i
-                  className={`fa-solid ${status === "stopped" || status === "editing" ? "fa-play" : "fa-stop"}`}
+                  className={`fa-solid ${!isSpeechSupported ? "fa-exclamation-triangle" : (status === "stopped" || status === "editing" ? "fa-play" : "fa-stop")}`}
                 />
               </span>
               <span className="is-sr-only">
-                {status === "stopped" || status === "editing" ? "Start" : "Stop"}
+                {!isSpeechSupported ? "Speech recognition not supported" : (status === "stopped" || status === "editing" ? "Start" : "Stop")}
               </span>
             </button>
           </div>

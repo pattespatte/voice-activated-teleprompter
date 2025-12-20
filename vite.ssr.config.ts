@@ -22,6 +22,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 100000000,
     cssCodeSplit: false,
     minify: "terser",
+    outDir: "dist-ssr",
   },
   server: {
     open: true,
@@ -31,4 +32,7 @@ export default defineConfig({
       bulma: resolve(__dirname, "node_modules/bulma/sass/_index.scss"),
     },
   },
+  base: "./",
+  root: ".",
+  publicDir: "public",
 })
