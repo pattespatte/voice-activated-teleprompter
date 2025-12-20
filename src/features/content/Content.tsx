@@ -117,10 +117,7 @@ export const Content = () => {
                       : "has-text-white"
                 }
                 style={{
-                  display: 'inline-block',
-                  margin: '0.2em 0.1em',
                   cursor: 'pointer',
-                  borderRadius: '2px',
                 }}
                 {...itemProps}
                 dangerouslySetInnerHTML={{
