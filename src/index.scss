@@ -1,9 +1,20 @@
-@charset "utf-8";
+@use "bulma" with (
+  $grey-darker: hsl(221, 14%, 21%),
+  $black: hsl(221, 14%, 4%),
+  $white: hsl(221, 14%, 100%),
+  $grey: hsl(221, 14%, 48%),
+  $grey-dark: hsl(221, 14%, 29%),
+  $grey-light: hsl(221, 14%, 71%),
+  $grey-lighter: hsl(221, 14%, 86%),
+  $grey-lightest: hsl(221, 14%, 93%),
+  $red: hsl(348, 100%, 70%),
+  $yellow: hsl(42, 100%, 53%),
+  $green: hsl(153, 53%, 53%),
+  $cyan: hsl(198, 100%, 70%)
+);
 
 $button-disabled-background-color: hsl(0, 0%, 4%);
 $button-disabled-opacity: 0.2;
-
-@use "bulma";
 
 html,
 body {

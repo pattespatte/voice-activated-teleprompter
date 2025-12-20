@@ -9,7 +9,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      bulma: resolve(__dirname, "node_modules/bulma/bulma.sass"),
+      bulma: resolve(__dirname, "node_modules/bulma/sass/_index.scss"),
     },
   },
 })
