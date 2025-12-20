@@ -24,7 +24,7 @@ import {
   SUPPORTED_LOCALES,
 } from "./navbarSlice"
 
-import { resetTranscriptionIndices } from "../content/contentSlice"
+import { resetTranscriptionIndices, updateInitialTextForLanguage } from "../content/contentSlice"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
@@ -97,6 +97,7 @@ export const NavBar = () => {
                           const newLanguage = e.currentTarget.value
                           dispatch(setLanguage(newLanguage))
                           dispatch(changeLanguage(newLanguage))
+                          dispatch(updateInitialTextForLanguage(newLanguage))
                         }}
                         title="Select Language"
                       >
