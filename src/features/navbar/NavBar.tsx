@@ -69,12 +69,41 @@ export const NavBar = () => {
           </div>
         </div>
         
+        {/* Play button */}
+        <div className="navbar-item">
+          <button
+            className="button is-primary is-small"
+            disabled={status === "editing"}
+            onClick={() =>
+              dispatch(
+                status === "stopped" ? startTeleprompter() : stopTeleprompter(),
+              )
+            }
+            title={
+              !isSpeechSupported
+                ? "Speech recognition not supported in this browser"
+                : (status === "stopped" || status === "editing" ? "Start" : "Stop")
+            }
+            aria-label={
+              !isSpeechSupported
+                ? "Speech recognition not supported"
+                : (status === "stopped" || status === "editing" ? "Start teleprompter" : "Stop teleprompter")
+            }
+          >
+            <span className="icon is-small">
+              <span
+                className={`fa-solid ${!isSpeechSupported ? "fa-exclamation-triangle" : (status === "stopped" || status === "editing" ? "fa-play" : "fa-stop")}`}
+              />
+            </span>
+          </button>
+        </div>
+        
         {/* Mobile menu toggle */}
         <button
           type="button"
           className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
           aria-label="menu"
-          aria-expanded={isMobileMenuOpen ? "true" : "false"}
+          aria-expanded={isMobileMenuOpen}
           onClick={toggleMobileMenu}
         >
           <span aria-hidden="true"></span>
@@ -233,34 +262,6 @@ export const NavBar = () => {
               </>
             ) : null}
 
-            <button
-              className="button is-primary"
-              disabled={status === "editing"}
-              onClick={() =>
-                dispatch(
-                  status === "stopped" ? startTeleprompter() : stopTeleprompter(),
-                )
-              }
-              title={
-                !isSpeechSupported
-                  ? "Speech recognition not supported in this browser"
-                  : (status === "stopped" || status === "editing" ? "Start" : "Stop")
-              }
-              aria-label={
-                !isSpeechSupported
-                  ? "Speech recognition not supported"
-                  : (status === "stopped" || status === "editing" ? "Start teleprompter" : "Stop teleprompter")
-              }
-            >
-              <span className="icon is-small">
-                <span
-                  className={`fa-solid ${!isSpeechSupported ? "fa-exclamation-triangle" : (status === "stopped" || status === "editing" ? "fa-play" : "fa-stop")}`}
-                />
-              </span>
-              <span className="is-sr-only">
-                {!isSpeechSupported ? "Speech recognition not supported" : (status === "stopped" || status === "editing" ? "Start" : "Stop")}
-              </span>
-            </button>
           </div>
         </div>
       </div>
