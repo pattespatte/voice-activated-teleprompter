@@ -48,6 +48,11 @@ export const NavBar = () => {
   }, [])
 
   const toggleMobileMenu = () => {
+    // Stop the teleprompter if it's currently playing
+    if (status === "started") {
+      dispatch(stopTeleprompter())
+    }
+    // Always toggle the menu state
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
