@@ -101,6 +101,67 @@ export const Content = () => {
     }
   }, [lastRef, scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements])
 
+  // Apply highlighting to markdown HTML elements based on speech recognition state
+  useEffect(() => {
+    if (isMarkdown && containerRef.current) {
+      const markdownContent = containerRef.current.querySelector('.markdown-content');
+      if (!markdownContent) return;
+
+      // Reset the markdown content to its original state
+      markdownContent.innerHTML = processedHtml;
+
+      // If we have transcript indices, apply highlighting
+      if (finalTranscriptIndex >= 0 || interimTranscriptIndex >= 0) {
+        // Get all text nodes from the markdown content
+        const walker = document.createTreeWalker(
+          markdownContent,
+          NodeFilter.SHOW_TEXT
+        );
+
+        let currentNode = walker.nextNode() as Text;
+        let wordIndex = 0;
+
+        // Process each text node and apply highlighting
+        while (currentNode) {
+          const text = currentNode.textContent || '';
+          if (text.trim()) {
+            // Split text into words and wrap each word in a span
+            const words = text.split(/(\s+)/);
+            const fragment = document.createDocumentFragment();
+            
+            words.forEach(word => {
+              if (word.trim()) {
+                const span = document.createElement('span');
+                span.textContent = word;
+                
+                // Apply highlighting based on transcript indices
+                if (wordIndex <= finalTranscriptIndex + 1) {
+                  span.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  span.style.borderBottom = '2px solid #9e9e9e';
+                  span.style.color = '#9e9e9e';
+                } else if (wordIndex <= interimTranscriptIndex + 1) {
+                  span.style.backgroundColor = 'rgba(255, 255, 0, 0.2)';
+                  span.style.borderBottom = '2px solid #ffdd57';
+                  span.style.color = '#ffdd57';
+                }
+                
+                fragment.appendChild(span);
+                wordIndex++;
+              } else if (word) {
+                // Add whitespace as-is
+                fragment.appendChild(document.createTextNode(word));
+              }
+            });
+            
+            // Replace the text node with our highlighted spans
+            currentNode.parentNode?.replaceChild(fragment, currentNode);
+          }
+          currentNode = walker.nextNode() as Text;
+        }
+      }
+    }
+  }, [isMarkdown, finalTranscriptIndex, interimTranscriptIndex, processedHtml])
+
   useLayoutEffect(() => {
     if (!containerRef.current || !bottomSpacerRef.current) {
       return
@@ -137,7 +198,7 @@ export const Content = () => {
         >
           {isMarkdown && processedHtml ? (
             <>
-              {/* Render formatted markdown HTML */}
+              {/* Render formatted markdown HTML with highlighting */}
               <div
                 className="markdown-content"
                 dangerouslySetInnerHTML={{ __html: processedHtml }}
@@ -165,8 +226,8 @@ export const Content = () => {
                 }}
               />
               
-              {/* Render text elements for speech recognition with proper highlighting */}
-              <div style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'auto' }}>
+              {/* Render invisible text elements for speech recognition functionality */}
+              <div style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}>
                 {textElements.map((textElement, index, array) => {
                   // Determine which element should have the ref for scrolling
                   // Use the current transcript index for the ref
@@ -176,23 +237,9 @@ export const Content = () => {
                   
                   const itemProps = shouldHaveRef ? { ref: lastRef } : {}
                   
-                  const isFinalHighlighted = finalTranscriptIndex > 0 && textElement.index <= finalTranscriptIndex + 1
-                  const isInterimHighlighted = interimTranscriptIndex > 0 && textElement.index <= interimTranscriptIndex + 1
-                  
                   return (
                     <span
                       key={textElement.index}
-                      onClick={() => {
-                        dispatch(setFinalTranscriptIndex(index - 1))
-                        dispatch(setInterimTranscriptIndex(index - 1))
-                      }}
-                      className={
-                        isFinalHighlighted
-                          ? "final-transcript"
-                          : isInterimHighlighted
-                                ? "interim-transcript"
-                                  : "has-text-white"
-                      }
                       style={{
                         display: textElement.value.includes('\n') ? "inline" : "inline-block",
                         margin: (() => {
@@ -202,8 +249,10 @@ export const Content = () => {
                           if (textElement.value === '" ') return "0 .25rem 0 -.25rem"; // Small margin for spaces
                           return "0"; // No margin for punctuation and quotes
                         })(),
-                        cursor: 'pointer',
-                        opacity: 0.01,
+                        // Make text elements completely invisible but still functional for scrolling
+                        opacity: 0,
+                        height: 0,
+                        overflow: 'hidden',
                       }}
                       {...itemProps}
                       dangerouslySetInnerHTML={{
