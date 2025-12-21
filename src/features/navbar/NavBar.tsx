@@ -99,7 +99,9 @@ export const NavBar = () => {
         {/* Play button */}
         <div className="navbar-item">
           <button
-            className="button is-primary is-small"
+            type="button"
+            className="button is-large play-button has-text-grey"
+            role="button"
             disabled={status === "editing"}
             onClick={() =>
               dispatch(
@@ -121,7 +123,7 @@ export const NavBar = () => {
                   : "Stop teleprompter, press P key to stop")
             }
           >
-            <span className="icon is-small">
+            <span className="icon">
               {!isSpeechSupported ? "⚠" : (status === "stopped" || status === "editing" ? "▶" : "■")}
             </span>
           </button>
@@ -132,7 +134,7 @@ export const NavBar = () => {
           type="button"
           className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
           aria-label="menu"
-          aria-expanded={isMobileMenuOpen}
+          aria-expanded={isMobileMenuOpen ? "true" : "false"}
           onClick={toggleMobileMenu}
         >
           <span aria-hidden="true"></span>
@@ -242,24 +244,26 @@ export const NavBar = () => {
             {status !== "started" ? (
               <>
                 <button
-                  className={`button ${status === "editing" ? "editing" : ""}`}
+                  type="button"
+                  className={`button is-medium has-text-white ${status === "editing" ? "editing" : ""}`}
                   onClick={() => dispatch(toggleEdit())}
                   title="Edit"
                   aria-label="Edit text"
                 >
-                  <span className="icon is-small">
+                  <span className="icon">
                     ✏
                   </span>
                   <span className="is-sr-only">Edit</span>
                 </button>
                 <button
-                  className="button"
+                  type="button"
+                  className="button is-medium has-text-grey"
                   disabled={status !== "stopped"}
                   onClick={() => fileInputRef.current?.click()}
                   title="Upload text file"
                   aria-label="Upload text file"
                 >
-                  <span className="icon is-small">
+                  <span className="icon">
                     ⬆
                   </span>
                   <span className="is-sr-only">Upload</span>
@@ -299,13 +303,14 @@ export const NavBar = () => {
                   <span className="is-sr-only">Flip Vertical</span>
                 </button> */}
                 <button
-                  className="button"
+                  type="button"
+                  className="button is-medium has-text-grey"
                   disabled={status !== "stopped"}
                   onClick={() => dispatch(resetTranscriptionIndices())}
                   title="Restart from the beginning"
                   aria-label="Restart from beginning"
                 >
-                  <span className="icon is-small">
+                  <span className="icon">
                     ↻
                   </span>
                   <span className="is-sr-only">Restart</span>
