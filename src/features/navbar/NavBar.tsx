@@ -91,14 +91,12 @@ export const NavBar = () => {
           <div className="title has-text-grey">
             <div className="is-hidden-mobile">Voice-Activated Teleprompter</div>
             <div className="is-hidden-desktop is-hidden-tablet">Teleprompter</div>
-            <ul className="is-size-7 is-hidden-mobile">
-              <li className="first has-text-white">
-                <a href="https://github.com/jlecomte/voice-activated-teleprompter">Based on original code by Julien Lecomte</a>
-              </li>
-            </ul>
+            <div className="is-size-7 is-hidden-mobile first">
+              <a href="https://github.com/jlecomte/voice-activated-teleprompter" className="has-text-link-light has-text-weight-normal">Based on original code by Julien Lecomte</a>
+            </div>
           </div>
         </div>
-        
+
         {/* Play button */}
         <div className="navbar-item">
           <button
@@ -113,15 +111,15 @@ export const NavBar = () => {
               !isSpeechSupported
                 ? "Speech recognition not supported in this browser"
                 : (status === "stopped" || status === "editing"
-                    ? "Start teleprompter (keyboard shortcut: P)"
-                    : "Stop teleprompter (keyboard shortcut: P)")
+                  ? "Start teleprompter (keyboard shortcut: P)"
+                  : "Stop teleprompter (keyboard shortcut: P)")
             }
             aria-label={
               !isSpeechSupported
                 ? "Speech recognition not supported"
                 : (status === "stopped" || status === "editing"
-                    ? "Start teleprompter, press P key to start"
-                    : "Stop teleprompter, press P key to stop")
+                  ? "Start teleprompter, press P key to start"
+                  : "Stop teleprompter, press P key to stop")
             }
           >
             <span className="icon is-small">
@@ -129,7 +127,7 @@ export const NavBar = () => {
             </span>
           </button>
         </div>
-        
+
         {/* Mobile menu toggle */}
         <button
           type="button"
@@ -143,7 +141,7 @@ export const NavBar = () => {
           <span aria-hidden="true"></span>
         </button>
       </div>
-      
+
       <div className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-end">
           {status === "stopped" ? (
@@ -165,7 +163,7 @@ export const NavBar = () => {
                         {Object.keys(SUPPORTED_LOCALES).map(locale => {
                           const label =
                             SUPPORTED_LOCALES[
-                              locale as keyof typeof SUPPORTED_LOCALES
+                            locale as keyof typeof SUPPORTED_LOCALES
                             ]
                           return (
                             <option key={locale} value={locale}>

@@ -5,10 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "vite",
     "build": "tsc && vite build",
-    "build:ssr": "tsc && vite build --config vite.ssr.config.ts && node test-ssr.mjs",
-    "test:ssr": "node test-ssr.mjs",
     "preview": "vite preview",
     "test": "exit 0",
     "format": "prettier --write .",

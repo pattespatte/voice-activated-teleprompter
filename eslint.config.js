@@ -68,7 +68,7 @@ export default [
     },
   },
   {
-    files: ['vite.config.ts', 'vite.ssr.config.ts'],
+    files: ['vite.config.ts'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
@@ -119,7 +119,7 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'dist-ssr/**', 'node_modules/**', 'eslint.config.js'],
+    ignores: ['dist/**', 'node_modules/**', 'eslint.config.js'],
   },
   prettier,
 ];
