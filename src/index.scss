@@ -541,66 +541,72 @@ textarea:focus {
 .markdown-content {
   color: bulma.$white;
   line-height: 1.6;
-  
+
   /* Headers */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: bulma.$white;
     margin: 1.5em 0 0.5em 0;
     font-weight: bold;
     line-height: 1.3;
   }
-  
+
   h1 {
     font-size: 2em;
     border-bottom: 2px solid bulma.$grey-dark;
     padding-bottom: 0.3em;
   }
-  
+
   h2 {
     font-size: 1.6em;
     border-bottom: 1px solid bulma.$grey-dark;
     padding-bottom: 0.2em;
   }
-  
+
   h3 {
     font-size: 1.3em;
   }
-  
+
   h4 {
     font-size: 1.1em;
   }
-  
+
   h5 {
     font-size: 1em;
   }
-  
+
   h6 {
     font-size: 0.9em;
     color: bulma.$grey-light;
   }
-  
+
   /* Text formatting */
   strong {
     font-weight: bold;
     color: bulma.$cyan;
   }
-  
-  em, i {
+
+  em,
+  i {
     font-style: italic;
     color: bulma.$yellow;
   }
-  
+
   /* Links */
   a {
     color: bulma.$cyan;
     text-decoration: underline;
-    
+
     &:hover {
       color: bulma.$yellow;
       text-decoration: underline;
     }
   }
-  
+
   /* Code */
   code {
     background-color: bulma.$grey-darker;
@@ -610,7 +616,7 @@ textarea:focus {
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
   }
-  
+
   pre {
     background-color: bulma.$grey-darker;
     border: 1px solid bulma.$grey-dark;
@@ -618,25 +624,26 @@ textarea:focus {
     padding: 1em;
     overflow-x: auto;
     margin: 1em 0;
-    
+
     code {
       background: none;
       padding: 0;
       color: bulma.$white;
     }
   }
-  
+
   /* Lists */
-  ul, ol {
+  ul,
+  ol {
     margin: 1em 0;
     padding-left: 2em;
-    
+
     li {
       margin: 0.5em 0;
       color: bulma.$white;
     }
   }
-  
+
   /* Blockquotes */
   blockquote {
     border-left: 4px solid bulma.$cyan;
@@ -645,62 +652,63 @@ textarea:focus {
     background-color: bulma.$grey-darker;
     color: bulma.$grey-light;
     font-style: italic;
-    
+
     p {
       margin: 0;
     }
   }
-  
+
   /* Tables */
   table {
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
-    
-    th, td {
+
+    th,
+    td {
       border: 1px solid bulma.$grey-dark;
       padding: 0.5em;
       text-align: left;
     }
-    
+
     th {
       background-color: bulma.$grey-darker;
       font-weight: bold;
       color: bulma.$white;
     }
-    
+
     td {
       color: bulma.$white;
     }
-    
+
     tr:nth-child(even) {
       background-color: rgba(bulma.$grey-darker, 0.3);
     }
   }
-  
+
   /* Horizontal rule */
   hr {
     border: none;
     border-top: 1px solid bulma.$grey-dark;
     margin: 2em 0;
   }
-  
+
   /* Paragraphs */
   p {
     margin: 1em 0;
     color: bulma.$white;
   }
-  
+
   /* Make markdown content clickable for speech recognition */
   * {
     cursor: pointer;
     transition: color 0.2s ease;
-    
+
     &:hover {
       color: bulma.$red !important;
     }
   }
-  
+
   /* Chord styling - make chords stand out */
   .chord {
     color: bulma.$yellow;
@@ -717,7 +725,7 @@ textarea:focus {
     position: relative;
     top: -0.1em;
     display: inline-block;
-    
+
     &:hover {
       background-color: rgba(bulma.$yellow, 0.3);
       transform: scale(1.05);
@@ -731,24 +739,25 @@ textarea:focus {
     h1 {
       font-size: 1.6em;
     }
-    
+
     h2 {
       font-size: 1.4em;
     }
-    
+
     h3 {
       font-size: 1.2em;
     }
-    
+
     pre {
       padding: 0.75em;
       font-size: 0.9em;
     }
-    
+
     table {
       font-size: 0.9em;
-      
-      th, td {
+
+      th,
+      td {
         padding: 0.3em;
       }
     }
