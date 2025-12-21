@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation "main navigation" [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e7]:
+        - generic [ref=e8]: Voice-Activated Teleprompter
+        - link "Based on original code by Julien Lecomte" [ref=e10] [cursor=pointer]:
+          - /url: https://github.com/jlecomte/voice-activated-teleprompter
+      - button "Start teleprompter, press P key to start" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: ▶
+      - button "menu" [expanded] [ref=e14] [cursor=pointer]
+    - generic [ref=e19]:
+      - combobox "Select Language" [ref=e24] [cursor=pointer]:
+        - option "🇺🇸 English (USA)" [selected]
+        - option "🇫🇷 French (France)"
+        - option "🇩🇪 German (Germany)"
+        - option "🇮🇹 Italian (Italy)"
+        - option "🇧🇷 Portuguese (Brazil)"
+        - option "🇪🇸 Spanish (Spain)"
+        - option "🇸🇪 Swedish (Sweden)"
+      - generic [ref=e25]:
+        - generic [ref=e26]: "Font size:"
+        - slider "Font size:" [ref=e27] [cursor=pointer]: "30"
+      - generic [ref=e28]:
+        - generic [ref=e29]: "Margin:"
+        - slider "Margin:" [ref=e30] [cursor=pointer]: "10"
+      - generic [ref=e31]:
+        - generic [ref=e32]: "Brightness:"
+        - slider "Brightness:" [ref=e33] [cursor=pointer]: "80"
+      - generic [ref=e34]:
+        - generic [ref=e35]: "Line position:"
+        - slider "Line position:" [ref=e36] [cursor=pointer]: "100"
+      - generic [ref=e37]:
+        - button "Edit text" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: ✏
+          - generic [ref=e40]: Edit
+        - button "Upload text file" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: ⬆
+          - generic [ref=e43]: Upload
+        - button "Restart from beginning" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: ↻
+          - generic [ref=e46]: Restart
+  - main [ref=e47]:
+    - generic [ref=e48]:
+      - generic [ref=e49] [cursor=pointer]: Click
+      - generic [ref=e50] [cursor=pointer]: "on"
+      - generic [ref=e51] [cursor=pointer]: the
+      - generic [ref=e52] [cursor=pointer]: "\""
+      - generic [ref=e53] [cursor=pointer]: Edit
+      - generic [ref=e54] [cursor=pointer]: "\""
+      - generic [ref=e55] [cursor=pointer]: button
+      - generic [ref=e56] [cursor=pointer]: and
+      - generic [ref=e57] [cursor=pointer]: paste
+      - generic [ref=e58] [cursor=pointer]: your
+      - generic [ref=e59] [cursor=pointer]: content
+      - generic [ref=e60] [cursor=pointer]: here
+      - generic [ref=e61] [cursor=pointer]: ...
+```

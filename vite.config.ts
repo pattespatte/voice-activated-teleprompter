@@ -61,12 +61,14 @@ export default defineConfig({
     fixStyleCrossorigin(),
   ],
   css: {
+    postcss: './postcss.config.mjs',
     preprocessorOptions: {
       scss: {
         verbose: true,
         quietDeps: true,
       },
     },
+    devSourcemap: true,
   },
   build: {
     rollupOptions: {
