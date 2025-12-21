@@ -171,7 +171,9 @@ test.describe('Voice-Activated Teleprompter', () => {
 
   test('should have proper accessibility attributes', async ({ page }) => {
     // Check for ARIA attributes
-    await expect(page.locator('nav[role="navigation"]')).toBeAttached();
+    // nav element should not have role attribute as it's semantically correct without it
+    await expect(page.locator('nav')).toBeAttached();
+    await expect(page.locator('nav[role="navigation"]')).not.toBeAttached();
     await expect(page.locator('button[aria-label*=""]')).toHaveAttribute('aria-label');
     await expect(page.locator('select[aria-label="Select Language"]')).toHaveAttribute('aria-label');
     await expect(page.locator('input[aria-label="Upload text file"]')).toHaveAttribute('aria-label');

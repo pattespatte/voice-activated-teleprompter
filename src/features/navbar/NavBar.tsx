@@ -83,7 +83,6 @@ export const NavBar = () => {
   return (
     <nav
       className="navbar is-black has-text-light is-unselectable"
-      role="navigation"
       aria-label="main navigation"
     >
       <div className="navbar-brand">
