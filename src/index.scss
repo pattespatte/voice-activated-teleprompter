@@ -280,32 +280,32 @@ div.content {
 /* Show hamburger menu on tablet and mobile screens */
 @media screen and (max-width: 1023px) {
   .navbar-burger {
-    display: flex !important;
+    display: flex;
   }
 }
 
 /* Keep hamburger menu visible on larger screens */
 @media screen and (min-width: 1024px) {
   .navbar-burger {
-    display: flex !important;
+    display: flex;
   }
 
   /* Ensure navbar content stays aligned to top */
   .navbar {
-    align-items: flex-start !important;
+    align-items: flex-start;
   }
 
   .navbar-brand {
-    align-items: flex-start !important;
+    align-items: flex-start;
   }
 
   .navbar-menu {
-    align-items: flex-start !important;
+    align-items: flex-start;
     padding-top: 0.5rem;
   }
 
   .navbar-end {
-    align-items: flex-start !important;
+    align-items: flex-start;
   }
 }
 
@@ -326,7 +326,7 @@ div.content {
 /* Show hamburger menu on tablet and mobile screens */
 @media screen and (max-width: 1023px) {
   .navbar-burger {
-    display: flex !important;
+    display: flex;
   }
 }
 
@@ -732,7 +732,7 @@ textarea:focus {
     transition: color 0.2s ease;
 
     &:hover {
-      color: bulma.$red !important;
+      color: bulma.$yellow;
     }
   }
 
