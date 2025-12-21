@@ -68,10 +68,15 @@ export const Content = () => {
         // Find the element with the scroll index
         const targetElement = textElements.find(el => el.index === currentTranscriptIndex + 1);
         
-        if (targetElement && lastRef.current) {
+        if (targetElement && lastRef.current && containerRef.current) {
           // Calculate the position to center the current word
-          // We want to position the current word at the scrollOffset distance from the top
-          const elementTop = lastRef.current.offsetTop;
+          // Use getBoundingClientRect() to get the actual position of the element
+          const elementRect = lastRef.current.getBoundingClientRect();
+          const containerRect = containerRef.current.getBoundingClientRect();
+          
+          // Calculate the element's position relative to the container
+          // Add the current scroll position to get the absolute position in the document
+          const elementTop = elementRect.top - containerRect.top + containerRef.current.scrollTop;
           const scrollToPosition = elementTop - scrollOffset;
           
           // Ensure we don't scroll to negative positions
