@@ -793,22 +793,24 @@ textarea:focus {
 
 /* Custom play button styles */
 .play-button {
-  background-color: hsl(198, 100%, 55%); /* Darker than Bulma's primary (cyan) */
-  border-color: hsl(198, 100%, 55%);
-  color: hsl(221, 14%, 100%); /* Light text */
+  background-color: #1db954; /* Spotify green */
+  border-color: #1db954;
+  color: #fff; /* White icon/text */
   
   &:hover {
-    background-color: hsl(221, 14%, 100%); /* White on hover */
-    border-color: hsl(221, 14%, 100%);
-    color: hsl(221, 14%, 4%); /* Dark text on white background */
+    background-color: #1aa34a; /* Darker shade of Spotify green for hover */
+    border-color: #1aa34a;
+    color: #fff; /* Keep white icon/text on hover */
   }
   
   &:focus {
-    outline: 2px solid hsl(198, 100%, 70%);
+    outline: 2px solid #1ED760; /* Lighter shade of Spotify green for focus */
     outline-offset: 2px;
   }
   
   &:disabled {
+    background-color: #1db954;
+    border-color: #1db954;
     opacity: 0.5;
     cursor: not-allowed;
   }

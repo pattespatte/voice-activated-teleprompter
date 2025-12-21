@@ -100,7 +100,7 @@ export const NavBar = () => {
         <div className="navbar-item">
           <button
             type="button"
-            className="button is-large play-button has-text-grey"
+            className="button is-large play-button"
             role="button"
             disabled={status === "editing"}
             onClick={() =>
