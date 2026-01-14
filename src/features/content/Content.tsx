@@ -58,6 +58,9 @@ export const Content = () => {
   // Track previous transcript index to detect click jumps (backward navigation)
   const prevTranscriptIndexRef = useRef<number>(-1);
 
+  // Track last highlighted index for efficient markdown highlighting updates
+  const lastHighlightedIndexRef = useRef<number>(-1);
+
   useEffect(() => {
     if (containerRef.current) {
       // Use the higher of final or interim transcript index
@@ -125,6 +128,58 @@ export const Content = () => {
       }
     }
   }, [scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements, isMarkdown])
+
+  // Efficient markdown highlighting - only update spans that changed
+  useEffect(() => {
+    if (!isMarkdown || !containerRef.current) {
+      return
+    }
+
+    const finalIndex = finalTranscriptIndex
+    const interimIndex = interimTranscriptIndex
+
+    // Skip if nothing to highlight
+    if (finalIndex < 0 && interimIndex < 0) {
+      return
+    }
+
+    // Determine which word should be highlighted
+    const highlightUpTo = Math.max(finalIndex, interimIndex)
+    if (highlightUpTo === lastHighlightedIndexRef.current) {
+      return
+    }
+
+    const lastIndex = lastHighlightedIndexRef.current
+    lastHighlightedIndexRef.current = highlightUpTo
+
+    // Clear all highlighting when going backward
+    if (highlightUpTo < lastIndex) {
+      const allSpans = containerRef.current.querySelectorAll('[data-word-index]')
+      allSpans.forEach(span => {
+        span.classList.remove('final-transcript', 'interim-transcript')
+      })
+    }
+
+    // Determine range to update (data-word-index is 1-based)
+    const startIndex = lastIndex < 0 ? 1 : Math.min(lastIndex, highlightUpTo) + 2
+    const endIndex = highlightUpTo + 2
+
+    // Update only the spans in the changed range
+    for (let i = startIndex; i <= endIndex; i++) {
+      const span = containerRef.current.querySelector(`[data-word-index="${i}"]`)
+      if (span) {
+        // Remove old classes
+        span.classList.remove('final-transcript', 'interim-transcript')
+
+        // Check interim (yellow) first so it takes precedence over final (gray)
+        if (interimIndex >= 0 && i === interimIndex + 1) {
+          span.classList.add('interim-transcript')
+        } else if (finalIndex >= 0 && i <= finalIndex + 1) {
+          span.classList.add('final-transcript')
+        }
+      }
+    }
+  }, [finalTranscriptIndex, interimTranscriptIndex, isMarkdown])
 
   useLayoutEffect(() => {
     if (!containerRef.current || !bottomSpacerRef.current) {
