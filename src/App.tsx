@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { NavBar } from "./features/navbar/NavBar"
 import { Content } from "./features/content/Content"
+import { DebugPanel } from "./features/debug/DebugPanel"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { startTeleprompter, stopTeleprompter } from "./app/thunks"
 import { selectStatus } from "./features/navbar/navbarSlice"
@@ -62,6 +63,7 @@ const App = () => {
     <div className="app">
       <NavBar />
       <Content />
+      <DebugPanel />
     </div>
   )
 }

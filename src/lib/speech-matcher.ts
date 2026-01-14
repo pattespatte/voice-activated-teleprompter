@@ -8,10 +8,22 @@ export const computeSpeechRecognitionTokenIndex = (
   reference: TextElement[],
   lastRecognizedTokenIndex: number,
 ) => {
+  const debug = process.env.NODE_ENV === 'development'
+
+  if (debug) {
+    console.log("=== speech-matcher.ts ===")
+    console.log("Input recognized:", recognized)
+    console.log("lastRecognizedTokenIndex:", lastRecognizedTokenIndex)
+  }
+
   // Tokenize the recognized input:
   const recognized_tokens = tokenize(recognized).filter(
     element => element.type === "TOKEN",
   )
+
+  if (debug) {
+    console.log("recognized_tokens:", recognized_tokens.map(t => t.value))
+  }
 
   // Convert the tokens back to a string:
   const comparison_string = recognized_tokens
@@ -21,6 +33,10 @@ export const computeSpeechRecognitionTokenIndex = (
     )
     .replace(/\s+/, " ")
     .trim()
+
+  if (debug) {
+    console.log("comparison_string:", comparison_string)
+  }
 
   if (lastRecognizedTokenIndex < 0) {
     lastRecognizedTokenIndex = 0
@@ -34,6 +50,10 @@ export const computeSpeechRecognitionTokenIndex = (
       lastRecognizedTokenIndex + recognized_tokens.length * 2 + 10,
     )
     .filter(element => element.type === "TOKEN")
+
+  if (debug) {
+    console.log("reference_tokens:", reference_tokens.map(t => t.value))
+  }
 
   // Now, compute the levenshtein distances between the comparison string
   // and each possible substring created from the reference tokens:
@@ -50,18 +70,35 @@ export const computeSpeechRecognitionTokenIndex = (
       )
       .replace(/\s+/, " ")
       .trim()
-    distances.push(levenshteinDistance(comparison_string, reference_substring))
+    const dist = levenshteinDistance(comparison_string, reference_substring)
+    distances.push(dist)
+    if (debug) {
+      console.log(`  Distance to "${reference_substring}": ${dist}`)
+    }
   }
 
   // Find the index of the minimum distance:
   const index = distances.indexOf(Math.min(...distances))
 
+  if (debug) {
+    console.log("Minimum distance:", Math.min(...distances))
+    console.log("Best match index:", index)
+  }
+
   // Trace that back to the token object:
   const token = reference_tokens[index]
 
   if (token) {
+    if (debug) {
+      console.log("Returning token index:", token.index)
+      console.log("========================")
+    }
     return token.index
   }
 
+  if (debug) {
+    console.log("No token found, returning last index:", lastRecognizedTokenIndex)
+    console.log("========================")
+  }
   return lastRecognizedTokenIndex
 }

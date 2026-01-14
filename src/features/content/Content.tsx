@@ -55,37 +55,62 @@ export const Content = () => {
   // Store the last scroll position to ensure we never scroll backward
   const lastScrollPositionRef = useRef<number>(0);
 
+  // Track previous transcript index to detect click jumps (backward navigation)
+  const prevTranscriptIndexRef = useRef<number>(-1);
+
   useEffect(() => {
     if (containerRef.current) {
       // Use the higher of final or interim transcript index
       const currentTranscriptIndex = Math.max(finalTranscriptIndex, interimTranscriptIndex);
-      
+
+      // Detect if this is a click (significant backward jump) vs singing (forward progression)
+      // A jump of more than 5 words backward indicates a click
+      const isClickJump = currentTranscriptIndex < prevTranscriptIndexRef.current - 5;
+
+      // Reset max scroll index on click jumps OR when starting fresh from beginning after clicking elsewhere
+      // If current index is much lower than max (e.g., clicked word 50, now singing word 0), reset
+      if (isClickJump || (maxScrollIndexRef.current > 10 && currentTranscriptIndex < maxScrollIndexRef.current - 10)) {
+        maxScrollIndexRef.current = Math.min(currentTranscriptIndex, -1);
+        lastScrollPositionRef.current = 0;
+      }
+
+      // Update previous index for next comparison
+      prevTranscriptIndexRef.current = currentTranscriptIndex;
+
       // Only scroll forward, never backward
       // Update the max index we've scrolled to
       if (currentTranscriptIndex > maxScrollIndexRef.current) {
         maxScrollIndexRef.current = currentTranscriptIndex;
-        
-        // Find the element with the scroll index
-        const targetElement = textElements.find(el => el.index === currentTranscriptIndex + 1);
-        
-        if (targetElement && lastRef.current && containerRef.current) {
+
+        let targetElement: HTMLElement | null = null
+
+        if (isMarkdown) {
+          // For markdown, find the element with matching data-word-index
+          targetElement = containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 1}"]`)
+        } else {
+          // For plain text, use the ref
+          targetElement = lastRef.current
+        }
+
+        if (targetElement && containerRef.current) {
           // Calculate the position to center the current word
-          // Use getBoundingClientRect() to get the actual position of the element
-          const elementRect = lastRef.current.getBoundingClientRect();
+          const elementRect = targetElement.getBoundingClientRect();
           const containerRect = containerRef.current.getBoundingClientRect();
-          
+
           // Calculate the element's position relative to the container
-          // Add the current scroll position to get the absolute position in the document
           const elementTop = elementRect.top - containerRect.top + containerRef.current.scrollTop;
           const scrollToPosition = elementTop - scrollOffset;
-          
+
           // Ensure we don't scroll to negative positions
           const finalScrollPosition = Math.max(scrollToPosition, 0);
-          
-          // Ensure we never scroll backward from our last position
-          const actualScrollPosition = Math.max(finalScrollPosition, lastScrollPositionRef.current);
+
+          // On click jumps, don't enforce the "never scroll backward" rule
+          let actualScrollPosition = finalScrollPosition;
+          if (!isClickJump) {
+            actualScrollPosition = Math.max(finalScrollPosition, lastScrollPositionRef.current);
+          }
           lastScrollPositionRef.current = actualScrollPosition;
-          
+
           containerRef.current.scrollTo({
             top: actualScrollPosition,
             behavior: "smooth",
@@ -99,68 +124,7 @@ export const Content = () => {
         })
       }
     }
-  }, [lastRef, scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements])
-
-  // Apply highlighting to markdown HTML elements based on speech recognition state
-  useEffect(() => {
-    if (isMarkdown && containerRef.current) {
-      const markdownContent = containerRef.current.querySelector('.markdown-content');
-      if (!markdownContent) return;
-
-      // Reset the markdown content to its original state
-      markdownContent.innerHTML = processedHtml;
-
-      // If we have transcript indices, apply highlighting
-      if (finalTranscriptIndex >= 0 || interimTranscriptIndex >= 0) {
-        // Get all text nodes from the markdown content
-        const walker = document.createTreeWalker(
-          markdownContent,
-          NodeFilter.SHOW_TEXT
-        );
-
-        let currentNode = walker.nextNode() as Text;
-        let wordIndex = 0;
-
-        // Process each text node and apply highlighting
-        while (currentNode) {
-          const text = currentNode.textContent || '';
-          if (text.trim()) {
-            // Split text into words and wrap each word in a span
-            const words = text.split(/(\s+)/);
-            const fragment = document.createDocumentFragment();
-            
-            words.forEach(word => {
-              if (word.trim()) {
-                const span = document.createElement('span');
-                span.textContent = word;
-                
-                // Apply highlighting based on transcript indices
-                if (wordIndex <= finalTranscriptIndex + 1) {
-                  span.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  span.style.borderBottom = '2px solid #9e9e9e';
-                  span.style.color = '#9e9e9e';
-                } else if (wordIndex <= interimTranscriptIndex + 1) {
-                  span.style.backgroundColor = 'rgba(255, 255, 0, 0.2)';
-                  span.style.borderBottom = '2px solid #ffdd57';
-                  span.style.color = '#ffdd57';
-                }
-                
-                fragment.appendChild(span);
-                wordIndex++;
-              } else if (word) {
-                // Add whitespace as-is
-                fragment.appendChild(document.createTextNode(word));
-              }
-            });
-            
-            // Replace the text node with our highlighted spans
-            currentNode.parentNode?.replaceChild(fragment, currentNode);
-          }
-          currentNode = walker.nextNode() as Text;
-        }
-      }
-    }
-  }, [isMarkdown, finalTranscriptIndex, interimTranscriptIndex, processedHtml])
+  }, [scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements, isMarkdown])
 
   useLayoutEffect(() => {
     if (!containerRef.current || !bottomSpacerRef.current) {
@@ -197,72 +161,23 @@ export const Content = () => {
           }}
         >
           {isMarkdown && processedHtml ? (
-            <>
-              {/* Render formatted markdown HTML with highlighting */}
-              <div
-                className="markdown-content"
-                dangerouslySetInnerHTML={{ __html: processedHtml }}
-                onClick={(e) => {
-                  // For markdown content, we need to map the click position to text elements
-                  if (isMarkdown) {
-                    // Get all text nodes from the markdown content
-                    const textNodes = Array.from(containerRef.current?.querySelectorAll('.markdown-content *') || [])
-                    const target = e.target as HTMLElement
-                    
-                    // Find the clicked text node by checking if target is contained in any text node
-                    let clickedIndex = -1
-                    for (let i = 0; i < textNodes.length; i++) {
-                      if (textNodes[i].contains(target)) {
-                        clickedIndex = i
-                        break
-                      }
-                    }
-                    
-                    if (clickedIndex >= 0) {
-                      dispatch(setFinalTranscriptIndex(clickedIndex - 1))
-                      dispatch(setInterimTranscriptIndex(clickedIndex - 1))
-                    }
+            <div
+              className="markdown-content"
+              onClick={(e) => {
+                // Find the closest element with data-word-index attribute
+                const target = e.target as HTMLElement
+                const wordSpan = target.closest('[data-word-index]')
+
+                if (wordSpan) {
+                  const wordIndex = parseInt(wordSpan.getAttribute('data-word-index') || '-1', 10)
+                  if (wordIndex >= 0) {
+                    dispatch(setFinalTranscriptIndex(wordIndex - 1))
+                    dispatch(setInterimTranscriptIndex(wordIndex - 1))
                   }
-                }}
-              />
-              
-              {/* Render invisible text elements for speech recognition functionality */}
-              <div style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}>
-                {textElements.map((textElement, index, array) => {
-                  // Determine which element should have the ref for scrolling
-                  // Use the current transcript index for the ref
-                  const currentTranscriptIndex = Math.max(finalTranscriptIndex, interimTranscriptIndex);
-                  const shouldHaveRef = currentTranscriptIndex >= 0 &&
-                    textElement.index === currentTranscriptIndex + 1;
-                  
-                  const itemProps = shouldHaveRef ? { ref: lastRef } : {}
-                  
-                  return (
-                    <span
-                      key={textElement.index}
-                      style={{
-                        display: textElement.value.includes('\n') ? "inline" : "inline-block",
-                        margin: (() => {
-                          if (textElement.value.includes('\n')) return "0";
-                          if (textElement.type === "TOKEN") return "0 .25rem";
-                          if (textElement.value === ' "') return "0 -.25rem 0 .25rem"; // Small margin for spaces
-                          if (textElement.value === '" ') return "0 .25rem 0 -.25rem"; // Small margin for spaces
-                          return "0"; // No margin for punctuation and quotes
-                        })(),
-                        // Make text elements completely invisible but still functional for scrolling
-                        opacity: 0,
-                        height: 0,
-                        overflow: 'hidden',
-                      }}
-                      {...itemProps}
-                      dangerouslySetInnerHTML={{
-                        __html: escape(textElement.value).replace(/\n/g, "<br>"),
-                      }}
-                    />
-                  )
-                })}
-              </div>
-            </>
+                }
+              }}
+              dangerouslySetInnerHTML={{ __html: processedHtml }}
+            />
           ) : (
             // Render plain text elements (existing logic)
             textElements.map((textElement, index, array) => {

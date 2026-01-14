@@ -1,4 +1,6 @@
-import { marked } from 'marked'
+import { marked } from "marked"
+import { injectWordSpans } from "./html-word-injector"
+import type { TextElement } from "./word-tokenizer"
 
 // Configure marked options for teleprompter use case
 marked.setOptions({
@@ -33,8 +35,8 @@ export const markdownToHtml = async (content: string): Promise<string> => {
     const result = await marked(content)
     return result
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error parsing markdown:', error)
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error parsing markdown:", error)
     }
     return content // Return original content if parsing fails
   }
@@ -49,10 +51,26 @@ export const markdownToHtmlSync = (content: string): string => {
     const processedContent = processChords(content)
     return marked.parse(processedContent) as string
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error parsing markdown:', error)
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error parsing markdown:", error)
     }
     return content // Return original content if parsing fails
+  }
+}
+
+/**
+ * Converts markdown to HTML with clickable word spans for index mapping
+ */
+export const markdownToHtmlWithWordSpans = (content: string, textElements: TextElement[]): string => {
+  try {
+    const processedContent = processChords(content)
+    const html = marked.parse(processedContent) as string
+    return injectWordSpans(html, textElements)
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error parsing markdown:", error)
+    }
+    return content
   }
 }
 
@@ -61,43 +79,71 @@ export const markdownToHtmlSync = (content: string): string => {
  */
 const processChords = (content: string): string => {
   // Replace chord notation [G] with styled spans
-  return content.replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g, (match) => {
-    const chord = match.slice(1, -1) // Remove brackets
-    return `<span class="chord">${chord}</span>`
-  })
+  return content.replace(
+    /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
+    match => {
+      const chord = match.slice(1, -1) // Remove brackets
+      return `<span class="chord">${chord}</span>`
+    },
+  )
 }
 
 /**
  * Strips markdown formatting to get plain text for speech recognition
  */
 export const stripMarkdown = (content: string): string => {
-  return content
-    // Remove chords like [G], [C], [G7], [Am], [F#m], etc. completely
-    .replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g, '')
-    // Remove metadata like [**Key:** G Major] and [**Time:** 3/4 (Waltz)]
-    .replace(/\[\*\*Key:\*\*.*?\]/g, '')
-    .replace(/\[\*\*Time:\*\*.*?\]/g, '')
-    // Remove other metadata in brackets [**...**]
-    .replace(/\[\*\*.*?\*\*.*?\]/g, '')
-    // Remove headers (# ## ### etc.) but keep the content
-    .replace(/^#{1,6}\s+/gm, '')
-    // Remove bold (**text**) but keep the text content
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    // Remove italic (*text*) but keep the text content
-    .replace(/\*(.*?)\*/g, '$1')
-    // Remove italic with underscores (_text_) but keep the text content
-    .replace(/_(.*?)_/g, '$1')
-    // Remove inline code (`code`) but keep the content
-    .replace(/`(.*?)`/g, '$1')
-    // Remove links [text](url) -> text
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-    // Remove list markers (-, *, +) but keep the content
-    .replace(/^\s*[-*+]\s+/gm, '')
-    // Remove ordered list markers (1., 2., etc.) but keep the content
-    .replace(/^\s*\d+\.\s+/gm, '')
-    // Remove blockquotes (>) but keep the content
-    .replace(/^>\s+/gm, '')
-    // Remove extra whitespace and normalize line breaks
-    .replace(/\n\s*\n/g, '\n')
-    .trim()
+  const lines = content.split("\n")
+  const filteredLines = lines.filter(line => {
+    const trimmedLine = line.trim()
+
+    // Skip empty lines
+    if (!trimmedLine) {
+      return false
+    }
+
+    // Skip headings (## Verse 1, etc.)
+    if (/^#{1,6}\s+/.test(trimmedLine)) {
+      return false
+    }
+
+    // Skip lines with markdown formatting patterns
+    const markdownPatterns = [
+      /\*\*.*?\*\*/, // Bold text
+      /\*.*?\*/, // Italic text
+      /_.*?_/, // Italic text (underscore)
+      /`.*?`/, // Inline code
+      /\[.*?\]\(.*?\)/, // Links
+      /^\s*[-*+]\s+/, // Unordered list markers
+      /^\s*\d+\.\s+/, // Ordered list markers
+      /^>\s+/, // Blockquotes
+      /^\s*\[.*\]\s*$/, // Entire line in brackets (including chords)
+    ]
+
+    // Skip if any markdown pattern is found on this line
+    for (const pattern of markdownPatterns) {
+      if (pattern.test(trimmedLine)) {
+        return false
+      }
+    }
+
+    // Skip chord-only lines (lines that are mostly chords)
+    const chordCount = (
+      trimmedLine.match(
+        /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
+      ) || []
+    ).length
+    const nonChordContent = trimmedLine
+      .replace(
+        /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
+        "",
+      )
+      .trim()
+    if (chordCount > 0 && nonChordContent.length === 0) {
+      return false
+    }
+
+    return true
+  })
+
+  return filteredLines.join("\n").trim()
 }

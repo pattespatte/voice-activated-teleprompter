@@ -25,6 +25,7 @@ import {
 } from "./navbarSlice"
 
 import { resetTranscriptionIndices, updateInitialTextForLanguage, setContent } from "../content/contentSlice"
+import { toggleDebug, selectIsDebugEnabled } from "../debug/debugSlice"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
@@ -40,6 +41,7 @@ export const NavBar = () => {
   // const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
   // const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const language = useAppSelector(selectLanguage)
+  const isDebugEnabled = useAppSelector(selectIsDebugEnabled)
 
   useEffect(() => {
     // Check if speech recognition is supported
@@ -302,6 +304,19 @@ export const NavBar = () => {
                   </span>
                   <span className="is-sr-only">Flip Vertical</span>
                 </button> */}
+                <button
+                  type="button"
+                  className={`button is-medium ${isDebugEnabled ? "is-warning" : "has-text-grey"}`}
+                  disabled={status !== "stopped"}
+                  onClick={() => dispatch(toggleDebug())}
+                  title="Toggle debug mode"
+                  aria-label="Toggle debug mode"
+                >
+                  <span className="icon">
+                    🐛
+                  </span>
+                  <span className="is-sr-only">Debug</span>
+                </button>
                 <button
                   type="button"
                   className="button is-medium has-text-grey"

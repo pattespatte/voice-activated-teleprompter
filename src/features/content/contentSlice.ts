@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "../../app/createAppSlice"
 import { type TextElement, tokenize } from "../../lib/word-tokenizer"
-import { isMarkdownContent, markdownToHtmlSync, stripMarkdown } from "../../lib/markdown-processor"
+import { isMarkdownContent, markdownToHtmlWithWordSpans, stripMarkdown } from "../../lib/markdown-processor"
 import { toggleEdit, SUPPORTED_LOCALES } from "../navbar/navbarSlice"
 
 export interface ContentSliceState {
@@ -78,9 +78,12 @@ export const contentSlice = createAppSlice({
       state.isMarkdown = isMarkdownFile
       
       if (isMarkdownFile) {
-        state.processedHtml = markdownToHtmlSync(content)
+        // First get plain text and tokenize it
         const plainText = stripMarkdown(content)
-        state.textElements = tokenize(plainText)
+        const textElements = tokenize(plainText)
+        state.textElements = textElements
+        // Then generate HTML with word spans that reference the text elements
+        state.processedHtml = markdownToHtmlWithWordSpans(content, textElements)
       } else {
         state.processedHtml = ""
         state.textElements = tokenize(content)
