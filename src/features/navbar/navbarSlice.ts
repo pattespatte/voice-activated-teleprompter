@@ -33,9 +33,14 @@ const detectLanguage = (): string => {
     return navigator.language
   }
 
-  // TODO: Try to find a "best match", for example if `navigator.language` is `fr-CA` or just `fr`...
+  // Try to find a "best match" by extracting the language code
+  // e.g., "fr-CA" → "fr" → match "fr-FR"
+  const languageCode = navigator.language.split("-")[0]
+  const matchingLocale = Object.keys(SUPPORTED_LOCALES).find(locale =>
+    locale.startsWith(languageCode)
+  )
 
-  return "en-US"
+  return matchingLocale ?? "en-US"
 }
 
 const initialState: NavBarSliceState = {
