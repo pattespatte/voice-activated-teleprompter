@@ -5,17 +5,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Commands
 
 ### Development
+
 - `yarn dev` - Start dev server (Vite)
 - `yarn build` - Type-check and build for production
 - `yarn preview` - Preview production build locally
 
 ### Code Quality
+
 - `yarn lint` - Run ESLint
 - `yarn lint:fix` - Fix ESLint issues automatically
 - `yarn type-check` - Run TypeScript type checking without emitting
 - `yarn format` - Format code with Prettier
 
 ### Testing
+
 - `yarn test` - Run Playwright tests
 
 ## Architecture Overview
@@ -23,6 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a **Voice-Activated Teleprompter** - a React SPA that auto-scrolls text as you read it aloud using the Web Speech API. The app builds to a single HTML file with all CSS/JS inlined for easy deployment.
 
 ### Tech Stack
+
 - **React 19** with TypeScript
 - **Redux Toolkit** for state management (modern `combineSlices` approach)
 - **Vite** with `vite-plugin-singlefile` for single-file builds
@@ -74,6 +78,7 @@ Text flows through multiple processing stages:
 ### Build Configuration
 
 The app builds to a single HTML file using:
+
 - `vite-plugin-singlefile` - Inlines all CSS and JS
 - Custom Vite plugins in `/src/plugins/` - Fix crossorigin issues, CSS padding problems
 - PostCSS with PurgeCSS - Removes unused Bulma styles
