@@ -89,7 +89,11 @@ export const Content = () => {
 
         if (isMarkdown) {
           // For markdown, find the element with matching data-word-index
-          targetElement = containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 1}"]`)
+          // Try current index first, then next index (in case of delimiter gap), then fallback
+          targetElement =
+            containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 1}"]`) ||
+            containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 2}"]`) ||
+            containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex}"]`)
         } else {
           // For plain text, use the ref
           targetElement = lastRef.current
@@ -161,8 +165,8 @@ export const Content = () => {
     }
 
     // Determine range to update (data-word-index is 1-based)
-    const startIndex = lastIndex < 0 ? 1 : Math.min(lastIndex, highlightUpTo) + 2
-    const endIndex = highlightUpTo + 2
+    const startIndex = lastIndex < 0 ? 0 : Math.min(lastIndex, highlightUpTo) + 1
+    const endIndex = highlightUpTo + 1
 
     // Update only the spans in the changed range
     for (let i = startIndex; i <= endIndex; i++) {
@@ -172,9 +176,9 @@ export const Content = () => {
         span.classList.remove('final-transcript', 'interim-transcript')
 
         // Check interim (yellow) first so it takes precedence over final (gray)
-        if (interimIndex >= 0 && i === interimIndex + 1) {
+        if (interimIndex >= 0 && i === interimIndex) {
           span.classList.add('interim-transcript')
-        } else if (finalIndex >= 0 && i <= finalIndex + 1) {
+        } else if (finalIndex >= 0 && i <= finalIndex) {
           span.classList.add('final-transcript')
         }
       }

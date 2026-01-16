@@ -36,7 +36,7 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
           textElements,
           lastFinalTranscriptIndex,
         )
-        dispatch(setFinalTranscriptIndex(finalTranscriptIndex))
+        dispatch(setFinalTranscriptIndex(finalTranscriptIndex - 1))
       }
 
       if (interim_transcript !== "") {
@@ -45,7 +45,7 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
           textElements,
           lastFinalTranscriptIndex,
         )
-        dispatch(setInterimTranscriptIndex(interimTranscriptIndex))
+        dispatch(setInterimTranscriptIndex(interimTranscriptIndex - 1))
       }
     },
   )

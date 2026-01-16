@@ -92,58 +92,21 @@ const processChords = (content: string): string => {
  * Strips markdown formatting to get plain text for speech recognition
  */
 export const stripMarkdown = (content: string): string => {
-  const lines = content.split("\n")
-  const filteredLines = lines.filter(line => {
-    const trimmedLine = line.trim()
-
-    // Skip empty lines
-    if (!trimmedLine) {
-      return false
-    }
-
-    // Skip headings (## Verse 1, etc.)
-    if (/^#{1,6}\s+/.test(trimmedLine)) {
-      return false
-    }
-
-    // Skip lines with markdown formatting patterns
-    const markdownPatterns = [
-      /\*\*.*?\*\*/, // Bold text
-      /\*.*?\*/, // Italic text
-      /_.*?_/, // Italic text (underscore)
-      /`.*?`/, // Inline code
-      /\[.*?\]\(.*?\)/, // Links
-      /^\s*[-*+]\s+/, // Unordered list markers
-      /^\s*\d+\.\s+/, // Ordered list markers
-      /^>\s+/, // Blockquotes
-      /^\s*\[.*\]\s*$/, // Entire line in brackets (including chords)
-    ]
-
-    // Skip if any markdown pattern is found on this line
-    for (const pattern of markdownPatterns) {
-      if (pattern.test(trimmedLine)) {
-        return false
-      }
-    }
-
-    // Skip chord-only lines (lines that are mostly chords)
-    const chordCount = (
-      trimmedLine.match(
-        /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
-      ) || []
-    ).length
-    const nonChordContent = trimmedLine
-      .replace(
-        /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
-        "",
-      )
-      .trim()
-    if (chordCount > 0 && nonChordContent.length === 0) {
-      return false
-    }
-
-    return true
-  })
-
-  return filteredLines.join("\n").trim()
+  return content
+    // Remove headings but keep other content
+    .replace(/^#{1,6}\s+.*$/gm, '')
+    // Strip inline formatting but keep the text
+    .replace(/\*\*(.+?)\*\*/g, '$1')      // Bold
+    .replace(/\*(.+?)\*/g, '$1')          // Italic
+    .replace(/_(.+?)_/g, '$1')            // Italic underscore
+    .replace(/`(.+?)`/g, '$1')            // Inline code
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')   // Links (keep text)
+    .replace(/^\s*[-*+]\s+/gm, '')        // List markers
+    .replace(/^\s*\d+\.\s+/gm, '')        // Numbered list markers
+    .replace(/^>\s+/gm, '')               // Blockquotes
+    // Remove chord notations
+    .replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g, '')
+    // Clean up extra whitespace
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
