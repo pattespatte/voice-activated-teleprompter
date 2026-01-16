@@ -1,38 +1,42 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for AI coding assistants working on this repository.
 
-## Common Commands
+## Commands
+
+Pick ONE package manager (replace `yarn` with `npm run` if using npm):
 
 ### Development
 
-- `yarn dev` - Start dev server (Vite)
-- `yarn build` - Type-check and build for production
-- `yarn preview` - Preview production build locally
+- `npm run dev` - Start Vite dev server (<http://localhost:5173>)
+- `npm run build` - Type-check and build for production
+- `npm run preview` - Preview production build locally
 
-### Code Quality
+### Quality & Testing
 
-- `yarn lint` - Run ESLint
-- `yarn lint:fix` - Fix ESLint issues automatically
-- `yarn type-check` - Run TypeScript type checking without emitting
-- `yarn format` - Format code with Prettier
+- `npm run lint` - Run ESLint checks
+- `npm run lint:fix` - Auto-fix ESLint issues
+- `npm run type-check` - Run TypeScript type checking without emitting
+- `npm run format` - Format code with Prettier
+- `npm run test` - Run Playwright tests
 
-### Testing
+To run specific tests:
 
-- `yarn test` - Run Playwright tests
+- `npx playwright test test-file.js` - Run single test
+- `npx playwright test --project=chromium` - Specific browser
 
 ## Architecture Overview
 
-This is a **Voice-Activated Teleprompter** - a React SPA that auto-scrolls text as you read it aloud using the Web Speech API. The app builds to a single HTML file with all CSS/JS inlined for easy deployment.
+**Voice-Activated Teleprompter** - React SPA that auto-scrolls text as you read aloud using Web Speech API. Builds to a single HTML file.
 
 ### Tech Stack
 
-- **React 19** with TypeScript
-- **Redux Toolkit** for state management (modern `combineSlices` approach)
-- **Vite** with `vite-plugin-singlefile` for single-file builds
-- **Bulma CSS** for styling
-- **Web Speech API** for voice recognition
-- **marked.js** for markdown rendering
+- React 19 + TypeScript
+- Redux Toolkit (`combineSlices` pattern)
+- Vite + `vite-plugin-singlefile`
+- Bulma CSS
+- Web Speech API
+- marked.js
 
 ### State Management
 

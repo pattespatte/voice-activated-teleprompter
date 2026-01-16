@@ -1,4 +1,5 @@
 {
+  "enabledMcpjsonServers": ["playwright", "vision-mcp-server", "web-reader", "web-search-prime", "Figma"],
   "permissions": {
     "allow": [
       "Bash(git add:*)",
@@ -15,8 +16,7 @@
       "Bash(npx playwright test:*)",
       "Bash(npm run type-check:*)",
       "Bash(open:*)",
-      "Bash(git checkout:*)",
-      "Bash(git stash push:*)"
+      "Bash(yarn type-check:*)"
     ]
   }
 }
