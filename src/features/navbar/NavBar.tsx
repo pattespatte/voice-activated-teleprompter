@@ -253,7 +253,7 @@ export const NavBar = () => {
                   <span className="icon">
                     ✏
                   </span>
-                  <span className="is-sr-only">Edit</span>
+                  <span className="is-hidden-mobile">Edit</span>
                 </button>
                 <button
                   type="button"
@@ -266,7 +266,7 @@ export const NavBar = () => {
                   <span className="icon">
                     ⬆
                   </span>
-                  <span className="is-sr-only">Upload</span>
+                  <span className="is-hidden-mobile">Upload</span>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -313,7 +313,7 @@ export const NavBar = () => {
                   <span className="icon">
                     ↻
                   </span>
-                  <span className="is-sr-only">Restart</span>
+                  <span className="is-hidden-mobile">Restart</span>
                 </button>
               </>
             ) : null}
