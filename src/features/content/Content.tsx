@@ -176,9 +176,9 @@ export const Content = () => {
         span.classList.remove('final-transcript', 'interim-transcript')
 
         // Check interim (yellow) first so it takes precedence over final (gray)
-        if (interimIndex >= 0 && i === interimIndex) {
+        if (interimIndex >= 0 && i === interimIndex + 1) {
           span.classList.add('interim-transcript')
-        } else if (finalIndex >= 0 && i <= finalIndex) {
+        } else if (finalIndex >= 0 && i <= finalIndex + 1) {
           span.classList.add('final-transcript')
         }
       }
