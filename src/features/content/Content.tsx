@@ -22,6 +22,8 @@ import {
   selectProcessedHtml,
 } from "./contentSlice"
 
+import { startTeleprompter, stopTeleprompter } from "../../app/thunks"
+
 export const Content = () => {
   const dispatch = useAppDispatch()
 
@@ -120,14 +122,14 @@ export const Content = () => {
 
           containerRef.current.scrollTo({
             top: actualScrollPosition,
-            behavior: "smooth",
+            behavior: "auto",
           })
         }
       } else if (currentTranscriptIndex < 0 && maxScrollIndexRef.current < 0) {
         lastScrollPositionRef.current = 0;
         containerRef.current.scrollTo({
           top: 0,
-          behavior: "smooth",
+          behavior: "auto",
         })
       }
     }
@@ -192,8 +194,53 @@ export const Content = () => {
 
     const containerHeight = containerRef.current.clientHeight
     bottomSpacerRef.current.style.height = `${scrollOffset + containerHeight}px`
-    
+
   }, [scrollOffset, isMarkdown ? 0 : textElements.length, isMarkdown, finalTranscriptIndex, interimTranscriptIndex])
+
+  // Keyboard shortcuts: Space (play/pause), ESC (stop), Arrow keys (navigate)
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Skip keyboard shortcuts when in edit mode
+      if (status === "editing") return;
+
+      const maxIndex = isMarkdown
+        ? (containerRef.current?.querySelectorAll('[data-word-index]').length || 0) - 1
+        : textElements.length - 1;
+
+      if (event.code === "Escape") {
+        event.preventDefault();
+        dispatch(stopTeleprompter());
+      } else if (event.code === "Space") {
+        event.preventDefault();
+        if (status === "stopped") {
+          dispatch(startTeleprompter());
+        } else if (status === "started") {
+          dispatch(stopTeleprompter());
+        }
+      } else if (event.code === "ArrowUp") {
+        event.preventDefault();
+        dispatch(setFinalTranscriptIndex(Math.max(-1, finalTranscriptIndex - 15)));
+        dispatch(setInterimTranscriptIndex(Math.max(-1, interimTranscriptIndex - 15)));
+      } else if (event.code === "ArrowLeft") {
+        event.preventDefault();
+        dispatch(setFinalTranscriptIndex(Math.max(-1, finalTranscriptIndex - 5)));
+        dispatch(setInterimTranscriptIndex(Math.max(-1, interimTranscriptIndex - 5)));
+      } else if (event.code === "ArrowDown") {
+        event.preventDefault();
+        dispatch(setFinalTranscriptIndex(Math.min(maxIndex, finalTranscriptIndex + 15)));
+        dispatch(setInterimTranscriptIndex(Math.min(maxIndex, interimTranscriptIndex + 15)));
+      } else if (event.code === "ArrowRight") {
+        event.preventDefault();
+        dispatch(setFinalTranscriptIndex(Math.min(maxIndex, finalTranscriptIndex + 5)));
+        dispatch(setInterimTranscriptIndex(Math.min(maxIndex, interimTranscriptIndex + 5)));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [status, textElements.length, isMarkdown, finalTranscriptIndex, interimTranscriptIndex, dispatch])
 
   return (
     <main className="content-area">
