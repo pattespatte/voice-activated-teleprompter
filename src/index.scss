@@ -210,6 +210,7 @@ body {
   color: $white;
   min-height: 3.25rem;
   position: relative;
+  padding-right: 2.5rem; /* Space for hamburger button */
   border-bottom: 1px solid $grey-darker;
 
   &.is-black {
@@ -249,30 +250,6 @@ body {
   }
 }
 
-.navbar-burger {
-  display: none;
-  cursor: pointer;
-  position: relative;
-  width: 2.5rem;
-  height: 3.25rem;
-  padding: 0;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background: none;
-  border: none;
-  color: $white;
-
-  span {
-    display: block;
-    width: 1.25rem;
-    height: 2px;
-    background-color: $white;
-    margin: 4px 0;
-    transition: all 0.2s ease;
-  }
-}
-
 .navbar-menu {
   flex: auto;
   display: flex;
@@ -289,6 +266,35 @@ body {
   align-items: stretch;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+/* Hamburger menu button - positioned on the right */
+.navbar-burger {
+  display: none;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5rem;
+  height: 3.25rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: none;
+  border: none;
+  color: $white;
+  z-index: 10;
+
+  span {
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    background-color: $white;
+    margin: 4px 0;
+    transition: all 0.2s ease;
+  }
 }
 
 /* Show hamburger menu on tablet and mobile screens */
@@ -320,6 +326,13 @@ body {
     flex-direction: column;
     padding: 1rem;
     gap: 1rem;
+  }
+}
+
+/* Keep hamburger menu visible on larger screens (desktop) */
+@media screen and (min-width: 1024px) {
+  .navbar-burger {
+    display: flex;
   }
 }
 

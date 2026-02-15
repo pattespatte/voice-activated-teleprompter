@@ -85,18 +85,21 @@ export const NavBar = () => {
       className="navbar is-black has-text-light is-unselectable"
       aria-label="main navigation"
     >
-      <div className="navbar-brand">
-        <div className="navbar-item">
-          <div className="title has-text-grey">
-            <div className="is-hidden-mobile">Voice-Activated Teleprompter</div>
-            <div className="is-hidden-desktop is-hidden-tablet">Teleprompter</div>
-            <div className="is-size-7 is-hidden-mobile first">
-              <a href="https://github.com/jlecomte/voice-activated-teleprompter" className="has-text-link-light has-text-weight-normal">Based on original code by Julien Lecomte</a>
-            </div>
-          </div>
-        </div>
+      {/* Mobile menu toggle - positioned on the right */}
+      <button
+        type="button"
+        className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
+        aria-label="menu"
+        aria-expanded={isMobileMenuOpen ? "true" : "false"}
+        onClick={toggleMobileMenu}
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
 
-        {/* Play button */}
+      <div className="navbar-brand">
+        {/* Play button - now first */}
         <div className="navbar-item">
           <button
             type="button"
@@ -129,18 +132,16 @@ export const NavBar = () => {
           </button>
         </div>
 
-        {/* Mobile menu toggle */}
-        <button
-          type="button"
-          className={`navbar-burger burger ${isMobileMenuOpen ? "is-active" : ""}`}
-          aria-label="menu"
-          aria-expanded={isMobileMenuOpen ? "true" : "false"}
-          onClick={toggleMobileMenu}
-        >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </button>
+        {/* Title - now second */}
+        <div className="navbar-item">
+          <div className="title has-text-grey">
+            <div className="is-hidden-mobile">Voice-Activated Teleprompter</div>
+            <div className="is-hidden-desktop is-hidden-tablet">Teleprompter</div>
+            <div className="is-size-7 is-hidden-mobile first">
+              <a href="https://github.com/jlecomte/voice-activated-teleprompter" className="has-text-link-light has-text-weight-normal">Based on original code by Julien Lecomte</a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
