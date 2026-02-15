@@ -1,29 +1,4 @@
-// Import Bulma with custom color variables using the correct path
-@use "bulma" with (
-  $grey-darker: hsl(221, 14%, 21%),
-  $black: hsl(221, 14%, 4%),
-  $white: hsl(221, 14%, 100%),
-  $grey: hsl(221, 14%, 48%),
-  $grey-dark: hsl(221, 14%, 29%),
-  $grey-light: hsl(221, 14%, 71%),
-  $grey-lighter: hsl(221, 14%, 86%),
-  $grey-lightest: hsl(221, 14%, 93%),
-  $red: hsl(348, 100%, 70%),
-  $yellow: hsl(42, 100%, 53%),
-  $green: hsl(153, 53%, 53%),
-  $cyan: hsl(198, 100%, 70%)
-);
-
-// Define custom button and navbar variables to prevent validation errors
-:root {
-  --bulma-button-disabled-shadow: none;
-  --bulma-button-disabled-background-color: hsl(221, 14%, 4%);
-  --bulma-button-disabled-border-color: hsl(221, 14%, 29%);
-  --bulma-button-disabled-opacity: 0.5;
-  --bulma-navbar-dropdown-arrow: hsl(198, 100%, 70%);
-}
-
-// Define custom color variables
+// Custom CSS - no Bulma dependency
 $grey-darker: hsl(221, 14%, 21%);
 $black: hsl(221, 14%, 4%);
 $white: hsl(221, 14%, 100%);
@@ -37,9 +12,14 @@ $yellow: hsl(42, 100%, 53%);
 $green: hsl(153, 53%, 53%);
 $cyan: hsl(198, 100%, 70%);
 
-
-$button-disabled-background-color: hsl(0, 0%, 4%);
-$button-disabled-opacity: 0.2;
+// Define custom button and navbar variables to prevent validation errors
+:root {
+  --bulma-button-disabled-shadow: none;
+  --bulma-button-disabled-background-color: hsl(221, 14%, 4%);
+  --bulma-button-disabled-border-color: hsl(221, 14%, 29%);
+  --bulma-button-disabled-opacity: 0.5;
+  --bulma-navbar-dropdown-arrow: hsl(198, 100%, 70%);
+}
 
 html,
 body {
@@ -58,7 +38,7 @@ body {
 
 .navbar {
   flex-shrink: 0;
-  border-bottom: 1px solid bulma.$grey-darker;
+  border-bottom: 1px solid hsl(221, 14%, 21%);
   /* Debug: Add background to visualize layout */
   /* background-color: rgba(255, 0, 0, 0.1); */
 }
@@ -104,19 +84,19 @@ body {
 
 .button,
 .button:focus {
-  background-color: bulma.$black;
-  border-color: bulma.$grey-dark;
-  color: bulma.$grey-dark;
+  background-color: hsl(221, 14%, 4%);
+  border-color: hsl(221, 14%, 48%)-dark;
+  color: hsl(221, 14%, 48%)-dark;
 }
 
 .button:hover {
-  border-color: bulma.$grey;
-  color: bulma.$grey;
+  border-color: hsl(221, 14%, 48%);
+  color: hsl(221, 14%, 48%);
 }
 
 .slider>span {
   margin-right: 0.5em;
-  color: bulma.$grey-light;
+  color: hsl(221, 14%, 48%)-light;
 }
 
 .buttons .dropdown {
@@ -141,7 +121,7 @@ input[type="range"] {
 }
 
 .navbar-brand li a {
-  color: bulma.$cyan;
+  color: hsl(198, 100%, 70%);
   text-decoration: underline;
 }
 
@@ -149,12 +129,12 @@ input[type="range"] {
 
 .content {
   overflow: auto;
-  background-color: bulma.$black;
+  background-color: hsl(221, 14%, 4%);
   border: none;
   outline: none;
   width: 100%;
   height: 100%;
-  color: bulma.$white;
+  color: hsl(221, 14%, 100%);
   padding: 0;
   line-height: inherit;
   word-wrap: break-word;
@@ -170,15 +150,15 @@ div.content {
 }
 
 .final-transcript {
-  color: bulma.$grey-darker;
+  color: hsl(221, 14%, 21%);
 }
 
 .interim-transcript {
-  color: bulma.$yellow;
+  color: hsl(42, 100%, 53%);
 }
 
 .content>span:hover {
-  color: bulma.$red;
+  color: hsl(348, 100%, 70%);
 }
 
 /* Responsive styles */
@@ -194,8 +174,8 @@ div.content {
       top: 100%;
       left: 0;
       right: 0;
-      background-color: bulma.$black;
-      border-top: 1px solid bulma.$grey-darker;
+      background-color: hsl(221, 14%, 4%);
+      border-top: 1px solid hsl(221, 14%, 21%);
       flex-direction: column;
       align-items: stretch;
 
@@ -400,12 +380,12 @@ input[type="range"] {
   }
 
   .final-transcript {
-    color: bulma.$grey-darker;
+    color: hsl(221, 14%, 21%);
     background-color: rgba(255, 255, 255, 0.05);
   }
 
   .interim-transcript {
-    color: bulma.$yellow;
+    color: hsl(42, 100%, 53%);
     background-color: rgba(255, 255, 0, 0.1);
   }
 }
@@ -430,7 +410,7 @@ input[type="range"] {
       position: relative;
 
       &:hover {
-        color: bulma.$red;
+        color: hsl(348, 100%, 70%);
         background-color: rgba(255, 0, 0, 0.1);
       }
     }
@@ -490,25 +470,25 @@ input[type="range"] {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid bulma.$cyan;
+  outline: 2px solid hsl(198, 100%, 70%);
   outline-offset: 2px;
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .navbar {
-    border-bottom: 2px solid bulma.$white;
+    border-bottom: 2px solid hsl(221, 14%, 100%);
   }
 
   .button {
-    border: 2px solid bulma.$grey-light;
+    border: 2px solid hsl(221, 14%, 48%)-light;
   }
 
   .content>span {
     border: 1px solid transparent;
 
     &:hover {
-      border-color: bulma.$white;
+      border-color: hsl(221, 14%, 100%);
     }
   }
 }
@@ -526,7 +506,7 @@ textarea:focus {
 @media screen and (max-width: 768px) {
   .button {
     &:focus {
-      outline: 3px solid bulma.$cyan;
+      outline: 3px solid hsl(198, 100%, 70%);
       outline-offset: 2px;
     }
 
@@ -539,7 +519,7 @@ textarea:focus {
   .navbar-item.slider {
     input[type="range"] {
       &:focus {
-        outline: 2px solid bulma.$cyan;
+        outline: 2px solid hsl(198, 100%, 70%);
         outline-offset: 2px;
       }
 
@@ -547,18 +527,18 @@ textarea:focus {
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        background: bulma.$cyan;
+        background: hsl(198, 100%, 70%);
         cursor: pointer;
-        border: 2px solid bulma.$white;
+        border: 2px solid hsl(221, 14%, 100%);
       }
 
       &::-moz-range-thumb {
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        background: bulma.$cyan;
+        background: hsl(198, 100%, 70%);
         cursor: pointer;
-        border: 2px solid bulma.$white;
+        border: 2px solid hsl(221, 14%, 100%);
       }
     }
   }
@@ -566,7 +546,7 @@ textarea:focus {
 
 /* Markdown content styles */
 .markdown-content {
-  color: bulma.$white;
+  color: hsl(221, 14%, 100%);
   line-height: 1.6;
 
   /* Headers */
@@ -576,7 +556,7 @@ textarea:focus {
   h4,
   h5,
   h6 {
-    color: bulma.$white;
+    color: hsl(221, 14%, 100%);
     margin: 1.5em 0 0.5em 0;
     font-weight: bold;
     line-height: 1.3;
@@ -584,13 +564,13 @@ textarea:focus {
 
   h1 {
     font-size: 2em;
-    border-bottom: 2px solid bulma.$grey-dark;
+    border-bottom: 2px solid hsl(221, 14%, 48%)-dark;
     padding-bottom: 0.3em;
   }
 
   h2 {
     font-size: 1.6em;
-    border-bottom: 1px solid bulma.$grey-dark;
+    border-bottom: 1px solid hsl(221, 14%, 48%)-dark;
     padding-bottom: 0.2em;
   }
 
@@ -608,36 +588,36 @@ textarea:focus {
 
   h6 {
     font-size: 0.9em;
-    color: bulma.$grey-light;
+    color: hsl(221, 14%, 48%)-light;
   }
 
   /* Text formatting */
   strong {
     font-weight: bold;
-    color: bulma.$cyan;
+    color: hsl(198, 100%, 70%);
   }
 
   em,
   i {
     font-style: italic;
-    color: bulma.$yellow;
+    color: hsl(42, 100%, 53%);
   }
 
   /* Links */
   a {
-    color: bulma.$cyan;
+    color: hsl(198, 100%, 70%);
     text-decoration: underline;
 
     &:hover {
-      color: bulma.$yellow;
+      color: hsl(42, 100%, 53%);
       text-decoration: underline;
     }
   }
 
   /* Code */
   code {
-    background-color: bulma.$grey-darker;
-    color: bulma.$yellow;
+    background-color: hsl(221, 14%, 21%);
+    color: hsl(42, 100%, 53%);
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-family: 'Courier New', monospace;
@@ -645,8 +625,8 @@ textarea:focus {
   }
 
   pre {
-    background-color: bulma.$grey-darker;
-    border: 1px solid bulma.$grey-dark;
+    background-color: hsl(221, 14%, 21%);
+    border: 1px solid hsl(221, 14%, 48%)-dark;
     border-radius: 4px;
     padding: 1em;
     overflow-x: auto;
@@ -655,7 +635,7 @@ textarea:focus {
     code {
       background: none;
       padding: 0;
-      color: bulma.$white;
+      color: hsl(221, 14%, 100%);
     }
   }
 
@@ -667,17 +647,17 @@ textarea:focus {
 
     li {
       margin: 0.5em 0;
-      color: bulma.$white;
+      color: hsl(221, 14%, 100%);
     }
   }
 
   /* Blockquotes */
   blockquote {
-    border-left: 4px solid bulma.$cyan;
+    border-left: 4px solid hsl(198, 100%, 70%);
     margin: 1em 0;
     padding: 0.5em 1em;
-    background-color: bulma.$grey-darker;
-    color: bulma.$grey-light;
+    background-color: hsl(221, 14%, 21%);
+    color: hsl(221, 14%, 48%)-light;
     font-style: italic;
 
     p {
@@ -693,37 +673,37 @@ textarea:focus {
 
     th,
     td {
-      border: 1px solid bulma.$grey-dark;
+      border: 1px solid hsl(221, 14%, 48%)-dark;
       padding: 0.5em;
       text-align: left;
     }
 
     th {
-      background-color: bulma.$grey-darker;
+      background-color: hsl(221, 14%, 21%);
       font-weight: bold;
-      color: bulma.$white;
+      color: hsl(221, 14%, 100%);
     }
 
     td {
-      color: bulma.$white;
+      color: hsl(221, 14%, 100%);
     }
 
     tr:nth-child(even) {
-      background-color: rgba(bulma.$grey-darker, 0.3);
+      background-color: rgba(hsl(221, 14%, 21%), 0.3);
     }
   }
 
   /* Horizontal rule */
   hr {
     border: none;
-    border-top: 1px solid bulma.$grey-dark;
+    border-top: 1px solid hsl(221, 14%, 48%)-dark;
     margin: 2em 0;
   }
 
   /* Paragraphs */
   p {
     margin: 1em 0;
-    color: bulma.$white;
+    color: hsl(221, 14%, 100%);
   }
 
   /* Make markdown content clickable for speech recognition */
@@ -732,14 +712,14 @@ textarea:focus {
     transition: color 0.2s ease;
 
     &:hover {
-      color: bulma.$yellow;
+      color: hsl(42, 100%, 53%);
     }
   }
 
   /* Chord styling - make chords stand out */
   .chord {
-    color: bulma.$yellow;
-    background-color: rgba(bulma.$grey-darker, 0.8);
+    color: hsl(42, 100%, 53%);
+    background-color: rgba(hsl(221, 14%, 21%), 0.8);
     padding: 0.2em 0.4em;
     border-radius: 4px;
     margin: 0 0.2em;
@@ -748,13 +728,13 @@ textarea:focus {
     font-weight: bold;
     white-space: nowrap;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    border: 1px solid bulma.$grey-dark;
+    border: 1px solid hsl(221, 14%, 48%)-dark;
     position: relative;
     top: -0.1em;
     display: inline-block;
 
     &:hover {
-      background-color: rgba(bulma.$yellow, 0.3);
+      background-color: rgba(hsl(42, 100%, 53%), 0.3);
       transform: scale(1.05);
     }
   }
@@ -822,8 +802,8 @@ textarea:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: bulma.$grey-darker;
-  border-top: 2px solid bulma.$yellow;
+  background-color: hsl(221, 14%, 21%);
+  border-top: 2px solid hsl(42, 100%, 53%);
   z-index: 1000;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
   max-height: 50vh;
@@ -841,7 +821,7 @@ textarea:focus {
   margin-bottom: 1rem;
 
   h3 {
-    color: bulma.$yellow;
+    color: hsl(42, 100%, 53%);
     font-size: 1.2rem;
     margin: 0;
   }
@@ -849,7 +829,7 @@ textarea:focus {
   .delete {
     background-color: transparent;
     border: none;
-    color: bulma.$white;
+    color: hsl(221, 14%, 100%);
     cursor: pointer;
     font-size: 1.5rem;
     padding: 0;
@@ -857,7 +837,7 @@ textarea:focus {
     height: 2rem;
 
     &:hover {
-      color: bulma.$red;
+      color: hsl(348, 100%, 70%);
     }
 
     &:before,
@@ -874,16 +854,16 @@ textarea:focus {
 }
 
 .debug-description {
-  color: bulma.$grey-light;
+  color: hsl(221, 14%, 48%)-light;
   font-size: 0.9rem;
   margin: 0;
 }
 
 .debug-textarea {
-  background-color: bulma.$black;
-  border: 1px solid bulma.$grey-dark;
+  background-color: hsl(221, 14%, 4%);
+  border: 1px solid hsl(221, 14%, 48%)-dark;
   border-radius: 4px;
-  color: bulma.$white;
+  color: hsl(221, 14%, 100%);
   font-family: inherit;
   font-size: 1rem;
   padding: 0.75rem;
@@ -891,13 +871,13 @@ textarea:focus {
   width: 100%;
 
   &:focus {
-    outline: 2px solid bulma.$yellow;
+    outline: 2px solid hsl(42, 100%, 53%);
     outline-offset: 2px;
-    border-color: bulma.$yellow;
+    border-color: hsl(42, 100%, 53%);
   }
 
   &::placeholder {
-    color: bulma.$grey;
+    color: hsl(221, 14%, 48%);
   }
 }
 
@@ -908,11 +888,11 @@ textarea:focus {
 }
 
 .debug-info {
-  color: bulma.$grey-light;
+  color: hsl(221, 14%, 48%)-light;
   font-size: 0.85rem;
 
   small {
-    color: bulma.$cyan;
+    color: hsl(198, 100%, 70%);
     font-weight: bold;
   }
 }

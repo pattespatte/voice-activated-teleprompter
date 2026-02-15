@@ -85,9 +85,4 @@ export default defineConfig({
   server: {
     open: true,
   },
-  resolve: {
-    alias: {
-      bulma: resolve(__dirname, "node_modules/bulma/sass/_index.scss"),
-    },
-  },
 })
