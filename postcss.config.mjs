@@ -16,7 +16,6 @@ export default {
       },
       safelist: [
         // Keep patterns that might be dynamically added
-        /^bulma-/,
         /^--/,
         /^is-/,
         'has-text-white',

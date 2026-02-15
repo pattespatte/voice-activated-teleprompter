@@ -34,7 +34,6 @@ To run specific tests:
 - React 19 + TypeScript
 - Redux Toolkit (`combineSlices` pattern)
 - Vite + `vite-plugin-singlefile`
-- Bulma CSS
 - Web Speech API
 - marked.js
 
@@ -85,7 +84,7 @@ The app builds to a single HTML file using:
 
 - `vite-plugin-singlefile` - Inlines all CSS and JS
 - Custom Vite plugins in `/src/plugins/` - Fix crossorigin issues, CSS padding problems
-- PostCSS with PurgeCSS - Removes unused Bulma styles
+- PostCSS with PurgeCSS
 
 See `/vite.config.ts` for build configuration.
 

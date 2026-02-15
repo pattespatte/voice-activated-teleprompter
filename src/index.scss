@@ -1,4 +1,4 @@
-// Custom CSS - no Bulma dependency
+// Custom CSS
 $grey-darker: hsl(221, 14%, 21%);
 $black: hsl(221, 14%, 4%);
 $white: hsl(221, 14%, 100%);
@@ -12,7 +12,7 @@ $yellow: hsl(42, 100%, 53%);
 $green: hsl(153, 53%, 53%);
 $cyan: hsl(198, 100%, 70%);
 
-// Bulma utility classes
+// Utility classes
 
 // Background colors
 .is-black {
@@ -237,13 +237,6 @@ textarea {
 }
 
 // Define custom button and navbar variables to prevent validation errors
-:root {
-  --bulma-button-disabled-shadow: none;
-  --bulma-button-disabled-background-color: hsl(221, 14%, 4%);
-  --bulma-button-disabled-border-color: hsl(221, 14%, 29%);
-  --bulma-button-disabled-opacity: 0.5;
-  --bulma-navbar-dropdown-arrow: hsl(198, 100%, 70%);
-}
 
 html,
 body {
@@ -693,8 +686,6 @@ div.content {
   transition: display 0.3s ease-in-out;
 
   &:not(.is-active) {
-    /* Debug: Change from display:none to visibility:hidden to maintain layout */
-    /* display: none; */
     visibility: hidden;
     opacity: 0;
     height: 0;
@@ -1103,6 +1094,7 @@ textarea:focus {
   p {
     margin: 1em 0;
     color: hsl(221, 14%, 100%);
+    white-space: pre;
   }
 
   /* Make markdown content clickable for speech recognition */
@@ -1115,7 +1107,7 @@ textarea:focus {
     }
   }
 
-  /* Chord styling - make chords stand out */
+  /* Chord styling - make chords stand out with pre-like spacing */
   .chord {
     color: hsl(42, 100%, 53%);
     background-color: rgba(hsl(221, 14%, 21%), 0.8);
@@ -1125,7 +1117,6 @@ textarea:focus {
     font-family: 'Courier New', monospace;
     font-size: 0.8em;
     font-weight: bold;
-    white-space: nowrap;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     border: 1px solid hsl(221, 14%, 48%)-dark;
     position: relative;

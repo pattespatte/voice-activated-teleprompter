@@ -6,7 +6,7 @@ This document provides guidelines for agentic coding assistants working on this 
 
 ### Core Commands
 
-- `npm run dev` - Start Vite dev server (http://localhost:5173)
+- `npm run dev` - Start Vite dev server (<http://localhost:5173>)
 - `npm run build` - Type-check and build for production
 - `npm run preview` - Preview production build locally
 - `npm run test` - Run Playwright tests (starts dev server automatically)
@@ -121,10 +121,9 @@ import { setContent } from "./contentSlice"
 
 ### CSS/Styling
 
-- **Bulma CSS framework** - Use Bulma classes for layout and components
 - **Custom styles** - Add in `src/index.scss` or component-specific SCSS
-- **Responsive design** - Use Bulma's responsive modifiers (`is-hidden-mobile`, etc.)
-- **Flexbox/Grid** - Prefer Bulma's utility classes over custom CSS
+- **Responsive design** - Use responsive modifiers (`is-hidden-mobile`, etc.)
+- **Flexbox/Grid** - Prefer utility classes over custom CSS
 
 ### Internationalization
 
