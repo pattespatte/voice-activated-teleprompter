@@ -74,18 +74,79 @@ export const markdownToHtmlWithWordSpans = (content: string, textElements: TextE
   }
 }
 
+const CHORD_REGEX = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/
+const CHORD_REGEX_GLOBAL = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g
+
 /**
- * Processes chords in the format [G], [C], etc. and converts them to styled HTML
+ * Processes chords in ChordPro format [G], [C], etc.
+ * Positions chords above the word they precede by wrapping word + chord in a container.
+ * Also marks lines containing chords with .has-chords class.
  */
 const processChords = (content: string): string => {
-  // Replace chord notation [G] with styled spans
-  return content.replace(
-    /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g,
-    match => {
-      const chord = match.slice(1, -1) // Remove brackets
-      return `<span class="chord">${chord}</span>`
-    },
-  )
+  const lines = content.split('\n')
+
+  const processedLines = lines.map(line => {
+    // Check if line has any chords
+    if (!CHORD_REGEX_GLOBAL.test(line)) return line
+    CHORD_REGEX_GLOBAL.lastIndex = 0
+
+    let result = ''
+    let remaining = line
+    let hasChords = false
+
+    while (remaining.length > 0) {
+      // Use non-global regex for single match with index
+      const chordMatch = remaining.match(CHORD_REGEX)
+
+      if (!chordMatch || chordMatch.index === undefined) {
+        result += remaining
+        break
+      }
+
+      const chordIndex = chordMatch.index
+      const chord = chordMatch[0].slice(1, -1)
+
+      // Add any text before the chord
+      result += remaining.substring(0, chordIndex)
+
+      // Skip the chord itself
+      remaining = remaining.substring(chordIndex + chordMatch[0].length)
+
+      // Skip whitespace and any additional chord notations to find the next text word
+      const afterChord = remaining.replace(/^(\s*)/, '')
+      const leadingWhitespace = RegExp.$1
+
+      // Skip over any chord notations that follow (two-line format: chord-only lines)
+      let skipped = afterChord
+      let skipMatch
+      while ((skipMatch = skipped.match(CHORD_REGEX)) && skipMatch.index === 0) {
+        result += `<span class="chord-word"><span class="chord">${skipMatch[0].slice(1, -1)}</span></span>`
+        skipped = skipped.substring(skipMatch[0].length).replace(/^\s*/, '')
+      }
+
+      // Find the next text word (letters/digits, not another chord)
+      const wordMatch = skipped.match(/^(\S+)/)
+      if (wordMatch) {
+        const word = wordMatch[1]
+        remaining = skipped.substring(word.length)
+
+        result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span>${word}</span>`
+        hasChords = true
+      } else {
+        // Chord with no following word (end of line or chord-only line)
+        result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span></span>`
+        remaining = skipped
+        hasChords = true
+      }
+    }
+
+    if (hasChords) {
+      return `<span class="has-chords">${result}</span>`
+    }
+    return result
+  })
+
+  return processedLines.join('\n')
 }
 
 /**

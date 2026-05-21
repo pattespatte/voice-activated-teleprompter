@@ -10,6 +10,7 @@ export interface NavBarSliceState {
   opacity: number
   scrollOffset: number
   language: string
+  showChords: boolean
 }
 
 export const SUPPORTED_LOCALES = {
@@ -52,6 +53,7 @@ const initialState: NavBarSliceState = {
   opacity: 80,
   scrollOffset: 100,
   language: detectLanguage(),
+  showChords: true,
 }
 
 export const navbarSlice = createAppSlice({
@@ -106,6 +108,10 @@ export const navbarSlice = createAppSlice({
       state.language = action.payload
       localStorage.setItem("teleprompter-language", action.payload)
     }),
+
+    toggleChords: create.reducer(state => {
+      state.showChords = !state.showChords
+    }),
   }),
 
   selectors: {
@@ -117,6 +123,7 @@ export const navbarSlice = createAppSlice({
     selectOpacity: state => state.opacity,
     selectScrollOffset: state => state.scrollOffset,
     selectLanguage: state => state.language,
+    selectShowChords: state => state.showChords,
   },
 })
 
@@ -132,6 +139,7 @@ export const {
   setOpacity,
   setScrollOffset,
   setLanguage,
+  toggleChords,
 } = navbarSlice.actions
 
 export const {
@@ -143,4 +151,5 @@ export const {
   selectOpacity,
   selectScrollOffset,
   selectLanguage,
+  selectShowChords,
 } = navbarSlice.selectors

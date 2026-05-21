@@ -11,6 +11,7 @@ import {
   selectMargin,
   selectOpacity,
   selectScrollOffset,
+  selectShowChords,
 } from "../navbar/navbarSlice"
 
 import {
@@ -32,6 +33,7 @@ export const Content = () => {
   const margin = useAppSelector(selectMargin)
   const opacity = useAppSelector(selectOpacity)
   const scrollOffset = useAppSelector(selectScrollOffset)
+  const showChords = useAppSelector(selectShowChords)
   const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
   const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const rawText = useAppSelector(selectRawText)
@@ -268,7 +270,7 @@ export const Content = () => {
         >
           {isMarkdown && processedHtml ? (
             <div
-              className="markdown-content"
+              className={`markdown-content${!showChords ? " hide-chords" : ""}`}
               onClick={(e) => {
                 // Find the closest element with data-word-index attribute
                 const target = e.target as HTMLElement

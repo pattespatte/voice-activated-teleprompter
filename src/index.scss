@@ -1107,26 +1107,40 @@ textarea:focus {
     }
   }
 
-  /* Chord styling - make chords stand out with pre-like spacing */
+  /* Chord styling - chords positioned above the lyrics */
   .chord {
     color: hsl(42, 100%, 53%);
-    background-color: rgba(hsl(221, 14%, 21%), 0.8);
-    padding: 0.2em 0.4em;
-    border-radius: 4px;
-    margin: 0 0.2em;
     font-family: 'Courier New', monospace;
-    font-size: 0.8em;
+    font-size: 0.75em;
     font-weight: bold;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    border: 1px solid hsl(221, 14%, 48%)-dark;
-    position: relative;
-    top: -0.1em;
-    display: inline-block;
+    position: absolute;
+    top: -1.3em;
+    left: 0;
+    white-space: nowrap;
+    pointer-events: none;
+  }
 
-    &:hover {
-      background-color: rgba(hsl(42, 100%, 53%), 0.3);
-      transform: scale(1.05);
-    }
+  /* Wrapper around words that have chords - provides positioning context */
+  .chord-word {
+    position: relative;
+    display: inline-block;
+    padding-top: 1.4em;
+  }
+
+  /* Lines containing chords need extra top padding */
+  .has-chords {
+    padding-top: 1.6em;
+    line-height: 1.4;
+  }
+
+  /* Hide chords toggle */
+  .hide-chords .chord,
+  .hide-chords .chord-word {
+    padding-top: 0;
+  }
+
+  .hide-chords .chord {
+    display: none;
   }
 }
 

@@ -12,6 +12,9 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
   // Track which text element we're currently mapping
   let textElementIndex = 0
 
+  // Sequential counter for data-word-index (only TOKENs get indices, no DELIMITER gaps)
+  let wordSpanIndex = 0
+
   // Recursive function to process text nodes
   const processNode = (node: Node): void => {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -78,10 +81,10 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
           if (foundIndex >= 0) {
             const span = document.createElement('span')
             span.textContent = token.value
-            span.setAttribute('data-word-index', textElements[foundIndex].index.toString())
+            span.setAttribute('data-word-index', wordSpanIndex.toString())
+            wordSpanIndex++
             span.style.cursor = 'pointer'
             span.style.display = 'inline'
-            // Prevent the span from affecting parent hover states
             span.style.pointerEvents = 'auto'
             fragment.appendChild(span)
           } else {

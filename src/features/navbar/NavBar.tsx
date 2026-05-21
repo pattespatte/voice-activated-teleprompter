@@ -13,6 +13,7 @@ import {
   setOpacity,
   setScrollOffset,
   setLanguage,
+  toggleChords,
   selectStatus,
   // selectHorizontallyFlipped,
   // selectVerticallyFlipped,
@@ -21,6 +22,7 @@ import {
   selectOpacity,
   selectScrollOffset,
   selectLanguage,
+  selectShowChords,
   SUPPORTED_LOCALES,
 } from "./navbarSlice"
 
@@ -40,6 +42,7 @@ export const NavBar = () => {
   // const horizontallyFlipped = useAppSelector(selectHorizontallyFlipped)
   // const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const language = useAppSelector(selectLanguage)
+  const showChords = useAppSelector(selectShowChords)
 
   useEffect(() => {
     // Check if speech recognition is supported
@@ -315,6 +318,19 @@ export const NavBar = () => {
                     ↻
                   </span>
                   <span className="is-hidden-mobile">Restart</span>
+                </button>
+                <button
+                  type="button"
+                  className={`button is-medium ${showChords ? "has-text-white" : "has-text-grey"}`}
+                  disabled={status !== "stopped"}
+                  onClick={() => dispatch(toggleChords())}
+                  title={showChords ? "Hide chords" : "Show chords"}
+                  aria-label={showChords ? "Hide chords" : "Show chords"}
+                >
+                  <span className="icon">
+                    {showChords ? "♪" : "♯"}
+                  </span>
+                  <span className="is-hidden-mobile">{showChords ? "Chords" : "Chords"}</span>
                 </button>
               </>
             ) : null}
