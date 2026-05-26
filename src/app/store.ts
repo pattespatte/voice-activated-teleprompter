@@ -26,6 +26,10 @@ export const makeStore = (preloadedState?: Partial<RootState>) => {
 
 export const store = makeStore()
 
+if (import.meta.env.DEV) {
+  ;(window as any).__store__ = store
+}
+
 // Infer the type of `store`
 export type AppStore = typeof store
 
