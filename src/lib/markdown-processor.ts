@@ -77,17 +77,120 @@ export const markdownToHtmlWithWordSpans = (content: string, textElements: TextE
 const CHORD_REGEX = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/
 const CHORD_REGEX_GLOBAL = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g
 
+const isChordOnlyLine = (line: string): boolean => {
+  CHORD_REGEX_GLOBAL.lastIndex = 0
+  if (!CHORD_REGEX_GLOBAL.test(line)) return false
+  const stripped = line.replace(CHORD_REGEX_GLOBAL, '').trim()
+  CHORD_REGEX_GLOBAL.lastIndex = 0
+  return stripped.length === 0
+}
+
+const mergeChordLineWithLyrics = (chordLine: string, lyricsLine: string): string => {
+  const chords: { column: number; chord: string }[] = []
+  let remaining = chordLine
+  let offset = 0
+
+  while (remaining.length > 0) {
+    const match = remaining.match(CHORD_REGEX)
+    if (!match || match.index === undefined) break
+
+    chords.push({
+      column: offset + match.index,
+      chord: match[0].slice(1, -1),
+    })
+
+    offset += match.index + match[0].length
+    remaining = remaining.substring(match.index + match[0].length)
+  }
+
+  if (chords.length === 0) return lyricsLine
+
+  const words: { start: number; end: number; text: string }[] = []
+  for (let j = 0; j < lyricsLine.length;) {
+    if (/\S/.test(lyricsLine[j])) {
+      const start = j
+      while (j < lyricsLine.length && /\S/.test(lyricsLine[j])) j++
+      words.push({ start, end: j, text: lyricsLine.substring(start, j) })
+    } else {
+      j++
+    }
+  }
+
+  if (words.length === 0) return lyricsLine
+
+  // Map each chord to the nearest word by column position
+  const chordMap = new Map<number, string[]>()
+  for (const { column, chord } of chords) {
+    let bestIdx = 0
+    let bestDist = Math.abs(words[0].start - column)
+
+    for (let w = 1; w < words.length; w++) {
+      const dist = Math.abs(words[w].start - column)
+      if (dist < bestDist) {
+        bestDist = dist
+        bestIdx = w
+      }
+    }
+
+    if (!chordMap.has(bestIdx)) chordMap.set(bestIdx, [])
+    chordMap.get(bestIdx)!.push(chord)
+  }
+
+  let result = ''
+  for (let w = 0; w < words.length; w++) {
+    const prevEnd = w > 0 ? words[w - 1].end : 0
+    result += lyricsLine.substring(prevEnd, words[w].start)
+
+    if (chordMap.has(w)) {
+      const chordSpans = chordMap
+        .get(w)!
+        .map(c => `<span class="chord">${c}</span>`)
+        .join('')
+      result += `<span class="chord-word">${chordSpans}${words[w].text}</span>`
+    } else {
+      result += words[w].text
+    }
+  }
+
+  if (words.length > 0) {
+    result += lyricsLine.substring(words[words.length - 1].end)
+  }
+
+  return `<span class="has-chords">${result}</span>`
+}
+
 /**
  * Processes chords in ChordPro format [G], [C], etc.
+ * Handles both two-line format (chords on line above lyrics) and inline format.
  * Positions chords above the word they precede by wrapping word + chord in a container.
- * Also marks lines containing chords with .has-chords class.
  */
 const processChords = (content: string): string => {
   const lines = content.split('\n')
+  const processedLines: string[] = []
 
-  const processedLines = lines.map(line => {
-    // Check if line has any chords
-    if (!CHORD_REGEX_GLOBAL.test(line)) return line
+  let i = 0
+  while (i < lines.length) {
+    const line = lines[i]
+
+    // Two-line format: chord-only line above lyrics line
+    if (
+      isChordOnlyLine(line) &&
+      i + 1 < lines.length &&
+      !isChordOnlyLine(lines[i + 1]) &&
+      lines[i + 1].trim().length > 0
+    ) {
+      processedLines.push(mergeChordLineWithLyrics(line, lines[i + 1]))
+      i += 2
+      continue
+    }
+
+    // Inline chord processing
+    CHORD_REGEX_GLOBAL.lastIndex = 0
+    if (!CHORD_REGEX_GLOBAL.test(line)) {
+      processedLines.push(line)
+      i++
+      continue
+    }
     CHORD_REGEX_GLOBAL.lastIndex = 0
 
     let result = ''
@@ -95,7 +198,6 @@ const processChords = (content: string): string => {
     let hasChords = false
 
     while (remaining.length > 0) {
-      // Use non-global regex for single match with index
       const chordMatch = remaining.match(CHORD_REGEX)
 
       if (!chordMatch || chordMatch.index === undefined) {
@@ -106,17 +208,12 @@ const processChords = (content: string): string => {
       const chordIndex = chordMatch.index
       const chord = chordMatch[0].slice(1, -1)
 
-      // Add any text before the chord
       result += remaining.substring(0, chordIndex)
-
-      // Skip the chord itself
       remaining = remaining.substring(chordIndex + chordMatch[0].length)
 
-      // Skip whitespace and any additional chord notations to find the next text word
       const afterChord = remaining.replace(/^(\s*)/, '')
       const leadingWhitespace = RegExp.$1
 
-      // Skip over any chord notations that follow (two-line format: chord-only lines)
       let skipped = afterChord
       let skipMatch
       while ((skipMatch = skipped.match(CHORD_REGEX)) && skipMatch.index === 0) {
@@ -124,16 +221,13 @@ const processChords = (content: string): string => {
         skipped = skipped.substring(skipMatch[0].length).replace(/^\s*/, '')
       }
 
-      // Find the next text word (letters/digits, not another chord)
       const wordMatch = skipped.match(/^(\S+)/)
       if (wordMatch) {
         const word = wordMatch[1]
         remaining = skipped.substring(word.length)
-
         result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span>${word}</span>`
         hasChords = true
       } else {
-        // Chord with no following word (end of line or chord-only line)
         result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span></span>`
         remaining = skipped
         hasChords = true
@@ -141,10 +235,12 @@ const processChords = (content: string): string => {
     }
 
     if (hasChords) {
-      return `<span class="has-chords">${result}</span>`
+      processedLines.push(`<span class="has-chords">${result}</span>`)
+    } else {
+      processedLines.push(result)
     }
-    return result
-  })
+    i++
+  }
 
   return processedLines.join('\n')
 }

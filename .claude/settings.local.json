@@ -30,7 +30,13 @@
       "Bash(git -c core.autocrlf=false commit -m \"$\\(cat <<''EOF''\nchore\\(gitignore\\): add .claude/ directory\n\nIgnore Claude Code settings directory to prevent tracking\nuser-specific configuration.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git -c core.autocrlf=false commit -m \"$\\(cat <<''EOF''\nchore: cleanup test files and improve gitignore\n\n- Remove performance test file \\(created during investigation\\)\n- Remove useless comment from main.tsx\n- Add dist/ to gitignore \\(build output should not be tracked\\)\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "mcp__zread__get_repo_structure",
-      "Bash(git -c core.autocrlf=false commit:*)"
+      "Bash(git -c core.autocrlf=false commit:*)",
+      "Bash(command npm *)",
+      "mcp__playwright__browser_wait_for",
+      "Bash(command npx *)",
+      "mcp__playwright__browser_file_upload",
+      "mcp__playwright__browser_close",
+      "Bash(~/.nvm/versions/node/latest/bin/npm run *)"
     ]
   },
   "enabledMcpjsonServers": [
@@ -38,6 +44,17 @@
     "vision-mcp-server",
     "web-reader",
     "web-search-prime",
-    "Figma"
+    "Figma",
+    "a11y",
+    "open-websearch",
+    "web-search",
+    "tavily-remote-mcp",
+    "ollama-web-search",
+    "hf-mcp-server",
+    "mrkrsl-web-search-mcp",
+    "github",
+    "read-website-fast",
+    "context7",
+    "repomix"
   ]
 }
