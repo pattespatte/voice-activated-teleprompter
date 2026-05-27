@@ -109,7 +109,7 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
       // - Chord spans (class="chord"): "[G]", "[C]" etc.
       // - Strong (bold) elements like "**Key:**", "**Time:**"
       const skipTags = ['CODE', 'PRE', 'STYLE', 'SCRIPT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'STRONG']
-      if (skipTags.includes(tagName) || element.classList.contains('chord')) {
+      if (skipTags.includes(tagName) || element.classList.contains('chord') || element.classList.contains('chord-word')) {
         return
       }
 

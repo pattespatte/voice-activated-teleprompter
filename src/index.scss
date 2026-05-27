@@ -1074,32 +1074,25 @@ textarea:focus {
     font-family: 'Courier New', monospace;
     font-size: 0.75em;
     font-weight: bold;
-    position: absolute;
-    top: -1.3em;
-    left: 0;
     white-space: nowrap;
     pointer-events: none;
+    line-height: 1.2;
   }
 
-  /* Wrapper around words that have chords - provides positioning context */
+  /* Wrapper around words that have chords - stacks chord above word */
   .chord-word {
-    position: relative;
-    display: inline-block;
-    padding-top: 1.4em;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    vertical-align: baseline;
   }
 
   /* Lines containing chords need extra top padding */
   .has-chords {
-    padding-top: 1.6em;
     line-height: 1.4;
   }
 
   /* Hide chords toggle */
-  .hide-chords .chord,
-  .hide-chords .chord-word {
-    padding-top: 0;
-  }
-
   .hide-chords .chord {
     display: none;
   }
