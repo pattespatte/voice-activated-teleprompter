@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { escape } from "html-escaper"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setContent, setFinalTranscriptIndex, setInterimTranscriptIndex } from "./contentSlice"
+import { parseFrontmatter } from "../../lib/markdown-processor"
 
 import {
   selectStatus,
@@ -46,7 +47,7 @@ export const Content = () => {
   const style = {
     fontSize: `${fontSize}px`,
     padding: `0 ${margin}px`,
-    lineHeight: '1.6',
+    lineHeight: '1.3',
   }
 
   const containerRef = useRef<null | HTMLDivElement>(null)
@@ -244,8 +245,33 @@ export const Content = () => {
     };
   }, [status, textElements.length, isMarkdown, finalTranscriptIndex, interimTranscriptIndex, dispatch])
 
+  const metaData = isMarkdown ? parseFrontmatter(rawText) : null
+  const [showMeta, setShowMeta] = useState(false)
+
   return (
     <main className="content-area">
+      {metaData && Object.keys(metaData).length > 0 && status !== "editing" && (
+        <div className="meta-info">
+          <button
+            className="meta-info-button"
+            onMouseEnter={() => setShowMeta(true)}
+            onMouseLeave={() => setShowMeta(false)}
+            onClick={() => setShowMeta(!showMeta)}
+            aria-label="Show song metadata"
+          >
+            ℹ
+          </button>
+          {showMeta && (
+            <div className="meta-info-popover">
+              {Object.entries(metaData).map(([key, value]) => (
+                <div key={key}>
+                  <strong>{key}:</strong> {value}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {status === "editing" ? (
         <textarea
           className="content"
