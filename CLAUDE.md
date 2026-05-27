@@ -101,7 +101,7 @@ Browser language detection with localStorage persistence. Placeholder text is tr
 - `/src/features/navbar/NavBar.tsx` - Controls and settings UI
 - `/src/features/content/Content.tsx` - Text display and scrolling logic
 - `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection
-- `/src/lib/chord-processor.ts` - Handles musical notation ([G], [C], etc.)
+- `/src/lib/chord-processor.ts` - Handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.)
 
 ### Language Support Note
 
