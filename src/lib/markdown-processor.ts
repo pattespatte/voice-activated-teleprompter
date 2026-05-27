@@ -165,7 +165,7 @@ const processChords = (content: string): string => {
 
       processedLines.push(
         `<span class="has-chords">` +
-        `<span class="chord-row">${chordRow}</span>\n` +
+        `<span class="chord-row">${chordRow}</span>` +
         `${lyrics}` +
         `</span>`
       )
