@@ -322,7 +322,6 @@ export const NavBar = () => {
                 <button
                   type="button"
                   className={`button is-medium ${showChords ? "has-text-white" : "has-text-grey"}`}
-                  disabled={status !== "stopped"}
                   onClick={() => dispatch(toggleChords())}
                   title={showChords ? "Hide chords" : "Show chords"}
                   aria-label={showChords ? "Hide chords" : "Show chords"}

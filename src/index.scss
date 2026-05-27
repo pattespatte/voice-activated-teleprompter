@@ -1139,7 +1139,7 @@ textarea:focus {
   }
 
   /* Hide chords toggle */
-  .hide-chords .chord-row {
+  &.hide-chords .chord-row {
     display: none;
   }
 }
