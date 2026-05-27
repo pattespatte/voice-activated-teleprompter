@@ -27,12 +27,17 @@ import {
 } from "./navbarSlice"
 
 import { resetTranscriptionIndices, updateInitialTextForLanguage, setContent } from "../content/contentSlice"
+import { LibraryBrowser } from "../library/LibraryBrowser"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSpeechSupported, setIsSpeechSupported] = useState(true)
+  const [showUrlInput, setShowUrlInput] = useState(false)
+  const [showLibrary, setShowLibrary] = useState(false)
+  const [urlInput, setUrlInput] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const urlInputRef = useRef<HTMLInputElement>(null)
 
   const status = useAppSelector(selectStatus)
   const fontSize = useAppSelector(selectFontSize)
@@ -80,6 +85,26 @@ export const NavBar = () => {
     // Reset the input value to allow uploading the same file again
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
+    }
+  }
+
+  const handleUrlLoad = async () => {
+    const url = urlInput.trim()
+    if (!url) return
+
+    try {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const content = await response.text()
+      const isMarkdown = url.toLowerCase().endsWith('.md')
+      dispatch(setContent({ content, isMarkdown }))
+      dispatch(resetTranscriptionIndices())
+      setShowUrlInput(false)
+      setUrlInput("")
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error loading URL:", err)
+      }
     }
   }
 
@@ -280,6 +305,56 @@ export const NavBar = () => {
                   aria-hidden="true"
                   tabIndex={-1}
                 />
+                <button
+                  type="button"
+                  className="button is-medium has-text-white"
+                  onClick={() => {
+                    setShowUrlInput(!showUrlInput)
+                    if (!showUrlInput) setTimeout(() => urlInputRef.current?.focus(), 50)
+                  }}
+                  title="Load from URL"
+                  aria-label="Load from URL"
+                >
+                  <span className="icon">
+                    🔗
+                  </span>
+                  <span className="is-hidden-mobile">URL</span>
+                </button>
+                {showUrlInput && (
+                  <div className="navbar-item url-input-container">
+                    <input
+                      ref={urlInputRef}
+                      type="url"
+                      className="input is-small url-input"
+                      placeholder="https://example.com/song.md"
+                      value={urlInput}
+                      onChange={e => setUrlInput(e.currentTarget.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') handleUrlLoad() }}
+                      aria-label="URL to load"
+                    />
+                    <button
+                      type="button"
+                      className="button is-small has-text-white"
+                      onClick={handleUrlLoad}
+                      title="Load"
+                      aria-label="Load URL"
+                    >
+                      Load
+                    </button>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="button is-medium has-text-white"
+                  onClick={() => setShowLibrary(true)}
+                  title="Browse lyrics library"
+                  aria-label="Browse lyrics library"
+                >
+                  <span className="icon">
+                    📚
+                  </span>
+                  <span className="is-hidden-mobile">Library</span>
+                </button>
                 {/* Flip buttons commented out as they are not needed */}
                 {/* <button
                   className={`button ${horizontallyFlipped ? "horizontally-flipped" : ""}`}
@@ -335,6 +410,7 @@ export const NavBar = () => {
           </div>
         </div>
       </div>
+      {showLibrary && <LibraryBrowser onClose={() => setShowLibrary(false)} />}
     </nav>
   )
 }
