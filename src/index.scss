@@ -1303,3 +1303,132 @@ textarea:focus {
     }
   }
 }
+
+/* URL input */
+.url-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.25rem 0;
+
+  .url-input {
+    width: 220px;
+    max-width: 40vw;
+  }
+}
+
+/* Library browser */
+.library-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.library-modal {
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  color: #eee;
+}
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #333;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #fff;
+  }
+}
+
+.library-close {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0 0.25rem;
+
+  &:hover { color: #fff; }
+}
+
+.library-setup {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label { font-size: 0.85em; color: #aaa; }
+}
+
+.library-search {
+  margin: 0.5rem 1rem;
+}
+
+.library-info {
+  padding: 0 1rem;
+  font-size: 0.75em;
+  color: #888;
+}
+
+.library-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.5rem 0.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.library-song {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover { background: rgba(255, 255, 255, 0.08); }
+}
+
+.library-song-title {
+  font-weight: 500;
+}
+
+.library-song-artist {
+  color: #aaa;
+  font-size: 0.85em;
+
+  &::before { content: "by "; }
+}
+
+.library-song-album {
+  color: #666;
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+.library-empty, .library-more {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.library-error {
+  color: #f66;
+  font-size: 0.85em;
+  padding: 0.25rem 1rem;
+  margin: 0;
+}

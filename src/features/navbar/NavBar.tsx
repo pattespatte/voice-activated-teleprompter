@@ -27,14 +27,12 @@ import {
 } from "./navbarSlice"
 
 import { resetTranscriptionIndices, updateInitialTextForLanguage, setContent } from "../content/contentSlice"
-import { LibraryBrowser } from "../library/LibraryBrowser"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSpeechSupported, setIsSpeechSupported] = useState(true)
   const [showUrlInput, setShowUrlInput] = useState(false)
-  const [showLibrary, setShowLibrary] = useState(false)
   const [urlInput, setUrlInput] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const urlInputRef = useRef<HTMLInputElement>(null)
@@ -344,18 +342,6 @@ export const NavBar = () => {
                     </button>
                   </div>
                 )}
-                <button
-                  type="button"
-                  className="button is-medium has-text-white"
-                  onClick={() => setShowLibrary(true)}
-                  title="Browse lyrics library"
-                  aria-label="Browse lyrics library"
-                >
-                  <span className="icon">
-                    📚
-                  </span>
-                  <span className="is-hidden-mobile">Library</span>
-                </button>
                 {/* Flip buttons commented out as they are not needed */}
                 {/* <button
                   className={`button ${horizontallyFlipped ? "horizontally-flipped" : ""}`}
@@ -411,7 +397,6 @@ export const NavBar = () => {
           </div>
         </div>
       </div>
-      {showLibrary && <LibraryBrowser onClose={() => setShowLibrary(false)} />}
     </nav>
   )
 }
