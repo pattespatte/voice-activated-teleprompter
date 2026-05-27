@@ -261,8 +261,7 @@ export const NavBar = () => {
                 </button>
                 <button
                   type="button"
-                  className="button is-medium has-text-grey"
-                  disabled={status !== "stopped"}
+                  className="button is-medium has-text-white"
                   onClick={() => fileInputRef.current?.click()}
                   title="Upload text file"
                   aria-label="Upload text file"
