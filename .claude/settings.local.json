@@ -36,7 +36,8 @@
       "Bash(command npx *)",
       "mcp__playwright__browser_file_upload",
       "mcp__playwright__browser_close",
-      "Bash(~/.nvm/versions/node/latest/bin/npm run *)"
+      "Bash(~/.nvm/versions/node/latest/bin/npm run *)",
+      "mcp__vision-mcp-server__analyze_image"
     ]
   },
   "enabledMcpjsonServers": [
