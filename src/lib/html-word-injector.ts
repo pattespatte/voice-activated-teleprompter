@@ -12,9 +12,6 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
   // Track which text element we're currently mapping
   let textElementIndex = 0
 
-  // Sequential counter for data-word-index (only TOKENs get indices, no DELIMITER gaps)
-  let wordSpanIndex = 0
-
   // Recursive function to process text nodes
   const processNode = (node: Node): void => {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -81,8 +78,7 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
           if (foundIndex >= 0) {
             const span = document.createElement('span')
             span.textContent = token.value
-            span.setAttribute('data-word-index', wordSpanIndex.toString())
-            wordSpanIndex++
+            span.setAttribute('data-word-index', textElements[foundIndex].index.toString())
             span.style.cursor = 'pointer'
             span.style.display = 'inline'
             span.style.pointerEvents = 'auto'
@@ -109,7 +105,7 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
       // - Chord spans (class="chord"): "[G]", "[C]" etc.
       // - Strong (bold) elements like "**Key:**", "**Time:**"
       const skipTags = ['CODE', 'PRE', 'STYLE', 'SCRIPT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'STRONG']
-      if (skipTags.includes(tagName) || element.classList.contains('chord') || element.classList.contains('chord-word')) {
+      if (skipTags.includes(tagName) || element.classList.contains('chord-row')) {
         return
       }
 

@@ -94,10 +94,9 @@ export const Content = () => {
 
         if (isMarkdown) {
           // For markdown, find the element with matching data-word-index
-          // Try current index first, then next index (in case of delimiter gap), then fallback
+          // currentTranscriptIndex is token.index - 1 from the thunk, so +1 gives the token.index
           targetElement =
             containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 1}"]`) ||
-            containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex + 2}"]`) ||
             containerRef.current.querySelector(`[data-word-index="${currentTranscriptIndex}"]`)
         } else {
           // For plain text, use the ref
@@ -169,25 +168,28 @@ export const Content = () => {
       })
     }
 
-    // Determine range to update (data-word-index is 1-based)
-    const startIndex = lastIndex < 0 ? 0 : Math.min(lastIndex, highlightUpTo) + 1
-    const endIndex = highlightUpTo + 1
+    // data-word-index values come from textElement.index (may have gaps due to delimiters)
+    // Highlight all spans whose index is within the recognized range
+    const highlightThreshold = highlightUpTo + 1
+    const lastThreshold = lastIndex < 0 ? -1 : lastIndex + 1
+    const interimTarget = interimIndex + 1
 
-    // Update only the spans in the changed range
-    for (let i = startIndex; i <= endIndex; i++) {
-      const span = containerRef.current.querySelector(`[data-word-index="${i}"]`)
-      if (span) {
-        // Remove old classes
+    const allSpans = containerRef.current.querySelectorAll('[data-word-index]')
+    allSpans.forEach(span => {
+      const idx = parseInt(span.getAttribute('data-word-index') || '-1', 10)
+      if (idx < 0) return
+
+      // Clear classes for spans that need re-evaluation
+      if (idx > lastThreshold && idx <= highlightThreshold) {
         span.classList.remove('final-transcript', 'interim-transcript')
 
-        // Check interim (yellow) first so it takes precedence over final (gray)
-        if (interimIndex >= 0 && i === interimIndex + 1) {
+        if (interimIndex >= 0 && idx === interimTarget) {
           span.classList.add('interim-transcript')
-        } else if (finalIndex >= 0 && i <= finalIndex + 1) {
+        } else if (finalIndex >= 0 && idx <= highlightThreshold) {
           span.classList.add('final-transcript')
         }
       }
-    }
+    })
   }, [finalTranscriptIndex, interimTranscriptIndex, isMarkdown])
 
   useLayoutEffect(() => {
