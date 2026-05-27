@@ -422,6 +422,7 @@ body {
 
 .content-area {
   height: 100%;
+  position: relative;
 }
 
 /* NavBar styles */
@@ -496,7 +497,7 @@ input[type="range"] {
 /* Content styles */
 /* Metadata info popover */
 .meta-info {
-  position: fixed;
+  position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   z-index: 100;
