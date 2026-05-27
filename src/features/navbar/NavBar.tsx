@@ -307,8 +307,7 @@ export const NavBar = () => {
                 </button> */}
                 <button
                   type="button"
-                  className="button is-medium has-text-grey"
-                  disabled={status !== "stopped"}
+                  className="button is-medium has-text-white"
                   onClick={() => dispatch(resetTranscriptionIndices())}
                   title="Restart from the beginning"
                   aria-label="Restart from beginning"
