@@ -8,10 +8,21 @@ marked.setOptions({
   gfm: true, // Enable GitHub Flavored Markdown
 })
 
+const FRONTMATTER_REGEX = /^---\n[\s\S]*?\n---\n?/
+
+/**
+ * Strips YAML frontmatter (---...---) from content
+ */
+export const stripFrontmatter = (content: string): string => {
+  return content.replace(FRONTMATTER_REGEX, '')
+}
+
 /**
  * Detects if content is markdown by checking for common markdown patterns
  */
 export const isMarkdownContent = (content: string): boolean => {
+  const stripped = stripFrontmatter(content)
+
   const markdownPatterns = [
     /^#{1,6}\s+/m, // Headers
     /\*\*.*?\*\*/, // Bold text
@@ -24,7 +35,7 @@ export const isMarkdownContent = (content: string): boolean => {
     /^>\s+/m, // Blockquotes
   ]
 
-  return markdownPatterns.some(pattern => pattern.test(content))
+  return markdownPatterns.some(pattern => pattern.test(stripped))
 }
 
 /**
@@ -32,13 +43,13 @@ export const isMarkdownContent = (content: string): boolean => {
  */
 export const markdownToHtml = async (content: string): Promise<string> => {
   try {
-    const result = await marked(content)
+    const result = await marked(stripFrontmatter(content))
     return result
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.error("Error parsing markdown:", error)
     }
-    return content // Return original content if parsing fails
+    return content
   }
 }
 
@@ -47,14 +58,13 @@ export const markdownToHtml = async (content: string): Promise<string> => {
  */
 export const markdownToHtmlSync = (content: string): string => {
   try {
-    // Process chords before markdown parsing
-    const processedContent = processChords(content)
+    const processedContent = processChords(stripFrontmatter(content))
     return marked.parse(processedContent) as string
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.error("Error parsing markdown:", error)
     }
-    return content // Return original content if parsing fails
+    return content
   }
 }
 
@@ -63,7 +73,7 @@ export const markdownToHtmlSync = (content: string): string => {
  */
 export const markdownToHtmlWithWordSpans = (content: string, textElements: TextElement[]): string => {
   try {
-    const processedContent = processChords(content)
+    const processedContent = processChords(stripFrontmatter(content))
     const html = marked.parse(processedContent) as string
     return injectWordSpans(html, textElements)
   } catch (error) {
@@ -77,118 +87,18 @@ export const markdownToHtmlWithWordSpans = (content: string, textElements: TextE
 const CHORD_REGEX = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/
 const CHORD_REGEX_GLOBAL = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add)?(?:\/[A-G][#b]?)?\]/g
 
-const isChordOnlyLine = (line: string): boolean => {
-  CHORD_REGEX_GLOBAL.lastIndex = 0
-  if (!CHORD_REGEX_GLOBAL.test(line)) return false
-  const stripped = line.replace(CHORD_REGEX_GLOBAL, '').trim()
-  CHORD_REGEX_GLOBAL.lastIndex = 0
-  return stripped.length === 0
-}
-
-const mergeChordLineWithLyrics = (chordLine: string, lyricsLine: string): string => {
-  const chords: { column: number; chord: string }[] = []
-  let remaining = chordLine
-  let offset = 0
-
-  while (remaining.length > 0) {
-    const match = remaining.match(CHORD_REGEX)
-    if (!match || match.index === undefined) break
-
-    chords.push({
-      column: offset + match.index,
-      chord: match[0].slice(1, -1),
-    })
-
-    offset += match.index + match[0].length
-    remaining = remaining.substring(match.index + match[0].length)
-  }
-
-  if (chords.length === 0) return lyricsLine
-
-  const words: { start: number; end: number; text: string }[] = []
-  for (let j = 0; j < lyricsLine.length;) {
-    if (/\S/.test(lyricsLine[j])) {
-      const start = j
-      while (j < lyricsLine.length && /\S/.test(lyricsLine[j])) j++
-      words.push({ start, end: j, text: lyricsLine.substring(start, j) })
-    } else {
-      j++
-    }
-  }
-
-  if (words.length === 0) return lyricsLine
-
-  // Map each chord to the nearest word by column position
-  const chordMap = new Map<number, string[]>()
-  for (const { column, chord } of chords) {
-    let bestIdx = 0
-    let bestDist = Math.abs(words[0].start - column)
-
-    for (let w = 1; w < words.length; w++) {
-      const dist = Math.abs(words[w].start - column)
-      if (dist < bestDist) {
-        bestDist = dist
-        bestIdx = w
-      }
-    }
-
-    if (!chordMap.has(bestIdx)) chordMap.set(bestIdx, [])
-    chordMap.get(bestIdx)!.push(chord)
-  }
-
-  let result = ''
-  for (let w = 0; w < words.length; w++) {
-    const prevEnd = w > 0 ? words[w - 1].end : 0
-    result += lyricsLine.substring(prevEnd, words[w].start)
-
-    if (chordMap.has(w)) {
-      const chordSpans = chordMap
-        .get(w)!
-        .map(c => `<span class="chord">${c}</span>`)
-        .join('')
-      result += `<span class="chord-word">${chordSpans}${words[w].text}</span>`
-    } else {
-      result += words[w].text
-    }
-  }
-
-  if (words.length > 0) {
-    result += lyricsLine.substring(words[words.length - 1].end)
-  }
-
-  return `<span class="has-chords">${result}</span>`
-}
-
 /**
- * Processes chords in ChordPro format [G], [C], etc.
- * Handles both two-line format (chords on line above lyrics) and inline format.
- * Positions chords above the word they precede by wrapping word + chord in a container.
+ * Processes chords in ChordPro inline format [G]word.
+ * Wraps chord + following word in .chord-word span for CSS stacking.
  */
 const processChords = (content: string): string => {
   const lines = content.split('\n')
   const processedLines: string[] = []
 
-  let i = 0
-  while (i < lines.length) {
-    const line = lines[i]
-
-    // Two-line format: chord-only line above lyrics line
-    if (
-      isChordOnlyLine(line) &&
-      i + 1 < lines.length &&
-      !isChordOnlyLine(lines[i + 1]) &&
-      lines[i + 1].trim().length > 0
-    ) {
-      processedLines.push(mergeChordLineWithLyrics(line, lines[i + 1]))
-      i += 2
-      continue
-    }
-
-    // Inline chord processing
+  for (const line of lines) {
     CHORD_REGEX_GLOBAL.lastIndex = 0
     if (!CHORD_REGEX_GLOBAL.test(line)) {
       processedLines.push(line)
-      i++
       continue
     }
     CHORD_REGEX_GLOBAL.lastIndex = 0
@@ -205,15 +115,17 @@ const processChords = (content: string): string => {
         break
       }
 
-      const chordIndex = chordMatch.index
       const chord = chordMatch[0].slice(1, -1)
 
-      result += remaining.substring(0, chordIndex)
-      remaining = remaining.substring(chordIndex + chordMatch[0].length)
+      // Add text before the chord
+      result += remaining.substring(0, chordMatch.index)
+      remaining = remaining.substring(chordMatch.index + chordMatch[0].length)
 
+      // Skip whitespace after chord
       const afterChord = remaining.replace(/^(\s*)/, '')
       const leadingWhitespace = RegExp.$1
 
+      // Skip consecutive chords with no word between
       let skipped = afterChord
       let skipMatch
       while ((skipMatch = skipped.match(CHORD_REGEX)) && skipMatch.index === 0) {
@@ -223,9 +135,8 @@ const processChords = (content: string): string => {
 
       const wordMatch = skipped.match(/^(\S+)/)
       if (wordMatch) {
-        const word = wordMatch[1]
-        remaining = skipped.substring(word.length)
-        result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span>${word}</span>`
+        remaining = skipped.substring(wordMatch[1].length)
+        result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span>${wordMatch[1]}</span>`
         hasChords = true
       } else {
         result += `${leadingWhitespace}<span class="chord-word"><span class="chord">${chord}</span></span>`
@@ -234,12 +145,7 @@ const processChords = (content: string): string => {
       }
     }
 
-    if (hasChords) {
-      processedLines.push(`<span class="has-chords">${result}</span>`)
-    } else {
-      processedLines.push(result)
-    }
-    i++
+    processedLines.push(hasChords ? `<span class="has-chords">${result}</span>` : result)
   }
 
   return processedLines.join('\n')
@@ -249,7 +155,7 @@ const processChords = (content: string): string => {
  * Strips markdown formatting to get plain text for speech recognition
  */
 export const stripMarkdown = (content: string): string => {
-  return content
+  return stripFrontmatter(content)
     // Remove headings but keep other content
     .replace(/^#{1,6}\s+.*$/gm, '')
     // Strip inline formatting but keep the text
