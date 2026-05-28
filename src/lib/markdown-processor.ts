@@ -144,7 +144,9 @@ const processChords = (content: string): string => {
       remaining = remaining.replace(/^\s*/, '')
 
       const wordMatch = remaining.match(/^(\S+)/)
-      if (wordMatch) {
+      const isWordAChord = wordMatch ? CHORD_REGEX.test(wordMatch[1]) : false
+
+      if (wordMatch && !isWordAChord) {
         chordPositions.push({ charPos: lyrics.length, chord })
         lyrics += wordMatch[1]
         remaining = remaining.substring(wordMatch[1].length)
