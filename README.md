@@ -33,7 +33,7 @@ You can also try the original app live [here](https://jlecomte.github.io/voice-a
 
 In development mode, the Redux store is exposed on `window.__store__` so you can test scrolling and highlighting without speaking.
 
-1. Run `npm run dev`
+1. Run `bun run dev`
 2. Paste your content and press P to start the teleprompter
 3. Open browser DevTools console
 

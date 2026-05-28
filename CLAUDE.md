@@ -4,26 +4,24 @@ This file provides guidance for AI coding assistants working on this repository.
 
 ## Commands
 
-Pick ONE package manager (replace `yarn` with `npm run` if using npm):
-
 ### Development
 
-- `npm run dev` - Start Vite dev server (<http://localhost:5173>)
-- `npm run build` - Type-check and build for production
-- `npm run preview` - Preview production build locally
+- `bun run dev` - Start Vite dev server (<http://localhost:5173>)
+- `bun run build` - Type-check and build for production
+- `bun run preview` - Preview production build locally
 
 ### Quality & Testing
 
-- `npm run lint` - Run ESLint checks
-- `npm run lint:fix` - Auto-fix ESLint issues
-- `npm run type-check` - Run TypeScript type checking without emitting
-- `npm run format` - Format code with Prettier
-- `npm run test` - Run Playwright tests
+- `bun run lint` - Run ESLint checks
+- `bun run lint:fix` - Auto-fix ESLint issues
+- `bun run type-check` - Run TypeScript type checking without emitting
+- `bun run format` - Format code with Prettier
+- `bun run test` - Run Playwright tests
 
 To run specific tests:
 
-- `npx playwright test test-file.js` - Run single test
-- `npx playwright test --project=chromium` - Specific browser
+- `bunx playwright test test-file.js` - Run single test
+- `bunx playwright test --project=chromium` - Specific browser
 
 ## Architecture Overview
 
