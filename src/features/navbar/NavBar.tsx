@@ -173,101 +173,6 @@ export const NavBar = () => {
 
       <div className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-end">
-          {status === "stopped" ? (
-            <>
-              <div className="navbar-item">
-                <div className="field">
-                  <div className="control">
-                    <div className="select is-small">
-                      <select
-                        value={language}
-                        onChange={e => {
-                          const newLanguage = e.currentTarget.value
-                          dispatch(setLanguage(newLanguage))
-                          dispatch(changeLanguage(newLanguage))
-                          dispatch(updateInitialTextForLanguage(newLanguage))
-                        }}
-                        title="Select Language"
-                      >
-                        {Object.keys(SUPPORTED_LOCALES).map(locale => {
-                          const label =
-                            SUPPORTED_LOCALES[
-                            locale as keyof typeof SUPPORTED_LOCALES
-                            ]
-                          return (
-                            <option key={locale} value={locale}>
-                              {label}
-                            </option>
-                          )
-                        })}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="navbar-item slider">
-                <label htmlFor="font-size-slider" className="slider-label">Font size:</label>
-                <input
-                  id="font-size-slider"
-                  type="range"
-                  step="5"
-                  min="10"
-                  max="200"
-                  value={fontSize}
-                  onChange={e =>
-                    dispatch(setFontSize(parseInt(e.currentTarget.value, 10)))
-                  }
-                  title="Font size"
-                />
-              </div>
-              <div className="navbar-item slider">
-                <label htmlFor="margin-slider" className="slider-label">Margin:</label>
-                <input
-                  id="margin-slider"
-                  type="range"
-                  step="10"
-                  min="0"
-                  max="500"
-                  value={margin}
-                  onChange={e =>
-                    dispatch(setMargin(parseInt(e.currentTarget.value, 10)))
-                  }
-                  title="Margin"
-                />
-              </div>
-              <div className="navbar-item slider">
-                <label htmlFor="brightness-slider" className="slider-label">Brightness:</label>
-                <input
-                  id="brightness-slider"
-                  type="range"
-                  step="10"
-                  min="0"
-                  max="100"
-                  value={opacity}
-                  onChange={e =>
-                    dispatch(setOpacity(parseInt(e.currentTarget.value, 10)))
-                  }
-                  title="Brightness"
-                />
-              </div>
-              <div className="navbar-item slider">
-                <label htmlFor="line-position-slider" className="slider-label">Line position:</label>
-                <input
-                  id="line-position-slider"
-                  type="range"
-                  step="10"
-                  min="10"
-                  max="200"
-                  value={scrollOffset}
-                  onChange={e =>
-                    dispatch(setScrollOffset(parseInt(e.currentTarget.value, 10)))
-                  }
-                  title="Line position"
-                />
-              </div>
-            </>
-          ) : null}
-
           <div className="buttons navbar-item">
             {status !== "started" ? (
               <>
@@ -395,6 +300,104 @@ export const NavBar = () => {
             ) : null}
 
           </div>
+
+          {status === "stopped" ? (
+            <>
+              <div className="navbar-item slider">
+                <label htmlFor="font-size-slider" className="slider-label">Font size:</label>
+                <input
+                  id="font-size-slider"
+                  type="range"
+                  step="5"
+                  min="10"
+                  max="200"
+                  value={fontSize}
+                  onChange={e =>
+                    dispatch(setFontSize(parseInt(e.currentTarget.value, 10)))
+                  }
+                  title="Font size"
+                />
+              </div>
+              <div className="navbar-item slider">
+                <label htmlFor="margin-slider" className="slider-label">Margin:</label>
+                <input
+                  id="margin-slider"
+                  type="range"
+                  step="10"
+                  min="0"
+                  max="500"
+                  value={margin}
+                  onChange={e =>
+                    dispatch(setMargin(parseInt(e.currentTarget.value, 10)))
+                  }
+                  title="Margin"
+                />
+              </div>
+              <div className="navbar-item slider">
+                <label htmlFor="brightness-slider" className="slider-label">Brightness:</label>
+                <input
+                  id="brightness-slider"
+                  type="range"
+                  step="10"
+                  min="0"
+                  max="100"
+                  value={opacity}
+                  onChange={e =>
+                    dispatch(setOpacity(parseInt(e.currentTarget.value, 10)))
+                  }
+                  title="Brightness"
+                />
+              </div>
+              <div className="navbar-item slider">
+                <label htmlFor="line-position-slider" className="slider-label">Line position:</label>
+                <input
+                  id="line-position-slider"
+                  type="range"
+                  step="10"
+                  min="10"
+                  max="200"
+                  value={scrollOffset}
+                  onChange={e =>
+                    dispatch(setScrollOffset(parseInt(e.currentTarget.value, 10)))
+                  }
+                  title="Line position"
+                />
+              </div>
+            </>
+          ) : null}
+
+          {status === "stopped" && (
+            <div className="navbar-item language-selector">
+              <div className="field">
+                <div className="control">
+                  <div className="select is-small">
+                    <select
+                      value={language}
+                      onChange={e => {
+                        const newLanguage = e.currentTarget.value
+                        dispatch(setLanguage(newLanguage))
+                        dispatch(changeLanguage(newLanguage))
+                        dispatch(updateInitialTextForLanguage(newLanguage))
+                      }}
+                      title="Select Language"
+                    >
+                      {Object.keys(SUPPORTED_LOCALES).map(locale => {
+                        const label =
+                          SUPPORTED_LOCALES[
+                          locale as keyof typeof SUPPORTED_LOCALES
+                          ]
+                        return (
+                          <option key={locale} value={locale}>
+                            {label}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </nav>

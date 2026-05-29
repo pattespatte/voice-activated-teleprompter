@@ -347,12 +347,30 @@ body {
 }
 
 .navbar-end {
+  display: flex;
   flex: 1;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
+  overflow: visible;
+}
+
+.navbar-end > .navbar-item {
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.navbar-end > .buttons.navbar-item {
+  flex-shrink: 1;
+  flex-grow: 0;
+}
+
+.navbar-end > .language-selector {
+  flex-shrink: 0;
+  flex-grow: 0;
+  margin-left: auto;
 }
 
 /* Hamburger menu button - positioned on the right */
@@ -485,7 +503,14 @@ body {
 }
 
 input[type="range"] {
-  width: 120px;
+  width: 80px;
+}
+
+// Language selector - right aligned
+.language-selector {
+  margin-left: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .navbar-brand ul {
