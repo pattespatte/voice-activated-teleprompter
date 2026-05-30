@@ -578,6 +578,16 @@ input[type="range"] {
     color: hsl(198, 100%, 70%);
     text-transform: capitalize;
   }
+
+  a {
+    color: hsl(198, 100%, 70%);
+    text-decoration: underline;
+    word-break: break-all;
+
+    &:hover {
+      color: hsl(42, 100%, 53%);
+    }
+  }
 }
 
 .content {
