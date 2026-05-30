@@ -267,7 +267,12 @@ export const Content = () => {
             <div className="meta-info-popover">
               {Object.entries(metaData).map(([key, value]) => (
                 <div key={key}>
-                  <strong>{key}:</strong> {value}
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{" "}
+                  {key === "source" ? (
+                    <a href={value} target="_blank" rel="noopener noreferrer">{value}</a>
+                  ) : (
+                    value
+                  )}
                 </div>
               ))}
             </div>

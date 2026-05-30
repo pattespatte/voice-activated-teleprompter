@@ -54,12 +54,15 @@ export const parseChordProDirectives = (content: string): Record<string, string>
       const [, directive, value] = match
       const trimmedValue = value?.trim() ?? ''
       if (directive === 'meta' && trimmedValue) {
-        // {meta: source_url http://...} → meta_source_url
+        // {meta: source http://...} → source
+        // Also handles legacy {meta: source_url http://...} → source
         const spaceIdx = trimmedValue.indexOf(' ')
         if (spaceIdx > 0) {
           const metaKey = trimmedValue.substring(0, spaceIdx).trim()
           const metaValue = trimmedValue.substring(spaceIdx + 1).trim()
-          meta[`meta_${metaKey}`] = metaValue
+          // Normalize: source_url → source
+          const normalizedKey = metaKey === 'source_url' ? 'source' : metaKey
+          meta[normalizedKey] = metaValue
         }
       } else if (trimmedValue) {
         // {title: My Song} → title: "My Song"
