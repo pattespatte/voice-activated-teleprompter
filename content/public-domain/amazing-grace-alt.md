@@ -1,74 +1,42 @@
-# Amazing Grace (Traditional Hymn) — Lyrics & Chords
+{title: Amazing Grace}
+{subtitle: Traditional Hymn}
+{composer: John Newton}
+{year: 1779}
+{key: G}
+{time: 3/4}
 
-**Public domain** (words by John Newton, 1779; traditional tune “New Britain”)  
-**Suggested key:** G major  
-**Time:** 3/4 (often played slowly)  
-**Common chords:** G, C, D, Em
+{c: Verse 1}
+[G]Amazing [G7]grace, how [C]sweet the [G]sound
+That [G]saved a wretch like [D]me
+[G]I once was [G7]lost, but [C]now am [G]found
+Was [G]blind, but [D]now I [G]see
 
----
+{c: Verse 2}
+[G]'Twas [G7]grace that [C]taught my [G]heart to fear
+And [G]grace my [D]fears relieved
+[G]How [G7]precious [C]did that [G]grace appear
+The [G]hour I [D]first be-[G]lieved
 
-## Chord chart (one chord per measure, typical)
+{c: Verse 3}
+[G]Through [G7]many [C]dangers, [G]toils and snares
+I [G]have already [D]come
+[G]'Tis [G7]grace hath [C]brought me [G]safe thus far
+And [G]grace will [D]lead me [G]home
 
-**Verse (repeat for each verse):**
+{c: Verse 4}
+[G]The [G7]Lord has [C]promised [G]good to me
+His [G]word my hope se-[D]cures
+[G]He [G7]will my [C]shield and [G]portion be
+As [Em]long as [D]life en-[G]dures
 
-| G | C | G | G |
-| G | C | G | D |
-| G | C | G | Em |
-| G | D | G | G |
+{c: Verse 5}
+[G]Yea, when this [G7]flesh and [C]heart shall [G]fail
+And [G]mortal life shall [D]cease
+[G]I shall [G7]possess, with-[C]in the veil [G]
+A [G]life of [D]joy and [G]peace
 
-*(This is a common folk/hymn accompaniment pattern; feel free to change strums or add passing chords.)*
-
----
-
-## Lyrics with chords (Key of G)
-
-### Verse 1
-
-**G** Amazing grace, how **C** sweet the sound  
-That **G** saved a wretch like **D** me  
-**G** I once was lost, but **C** now am found  
-Was **G** blind, but **D** now I **G** see  
-
-### Verse 2
-
-**G** ’Twas grace that taught my **C** heart to fear  
-And **G** grace my fears re**D**lieved  
-**G** How precious did that **C** grace appear  
-The **G** hour I **D** first be**G**lieved  
-
-### Verse 3
-
-**G** Through many dangers, **C** toils, and snares  
-I **G** have already **D** come  
-**G** ’Tis grace hath brought me **C** safe thus far  
-And **G** grace will **D** lead me **G** home  
-
-### Verse 4
-
-**G** The Lord has promised **C** good to me  
-His **G** word my hope se**D**cures  
-**G** He will my shield and **C** portion be  
-As **G** long as **D** life en**G**dures  
-
-### Verse 5
-
-**G** Yea, when this flesh and **C** heart shall fail  
-And **G** mortal life shall **D** cease  
-**G** I shall possess, with**C**in the veil  
-A **G** life of **D** joy and **G** peace  
-
-### Verse 6
-
-**G** The earth shall soon dis**C**solve like snow  
-The **G** sun forbear to **D** shine  
-**G** But God, who called me **C** here below  
-Will **G** be for**D**ever **G** mine  
-
----
-
-## Simple strum idea (3/4)
-
-- **Down – down – down** (1 2 3), or  
-- **Down – down/up – down/up** (1 2& 3&)
-
----
+{c: Verse 6}
+[G]The [G7]earth shall [C]soon dis-[G]solve like snow
+The [G]sun forbear to [D]shine
+[G]But [G7]God, who [C]called me [G]here below
+Will [G]be for-[D]ever [G]mine

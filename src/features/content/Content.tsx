@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { escape } from "html-escaper"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setContent, setFinalTranscriptIndex, setInterimTranscriptIndex } from "./contentSlice"
-import { parseFrontmatter } from "../../lib/markdown-processor"
+import { parseAllMetadata } from "../../lib/markdown-processor"
 
 import {
   selectStatus,
@@ -247,7 +247,7 @@ export const Content = () => {
     };
   }, [status, textElements.length, isMarkdown, finalTranscriptIndex, interimTranscriptIndex, dispatch])
 
-  const metaData = isMarkdown ? parseFrontmatter(rawText) : null
+  const metaData = isMarkdown ? parseAllMetadata(rawText) : null
   const [showMeta, setShowMeta] = useState(false)
 
   return (
