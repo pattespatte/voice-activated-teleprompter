@@ -274,6 +274,7 @@ html,
 body {
   height: 100vh;
   overflow: hidden;
+  margin: 0;
 }
 
 .app {
@@ -294,8 +295,6 @@ body {
   color: $white;
   min-height: 3.25rem;
   position: relative;
-  padding-right: 2.5rem;
-  /* Space for hamburger button */
   border-bottom: 1px solid $grey-darker;
 
   &.is-black {
@@ -313,6 +312,8 @@ body {
   align-items: center;
   flex-shrink: 0;
   min-height: 3.25rem;
+  flex-basis: 100%;
+  padding-right: 2.5rem;
 }
 
 .navbar-item {
