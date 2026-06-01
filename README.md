@@ -25,13 +25,13 @@ Changes made to the original version of [Voice-Activated Teleprompter](https://g
 - File upload support for importing scripts
 - Swedish language support
 - PostCSS with PurgeCSS for optimized builds
-- Dev mode: expose Redux store on `window.__store__` for silent testing via browser console
+- Redux store exposed on `window.__store__` for silent testing via browser console
 
 You can also try the original app live [here](https://jlecomte.github.io/voice-activated-teleprompter/dist/).
 
 ## Silent Testing
 
-In development mode, the Redux store is exposed on `window.__store__` so you can test scrolling and highlighting without speaking.
+The Redux store is exposed on `window.__store__` so you can test scrolling and highlighting without speaking.
 
 1. Run `bun run dev`
 2. Paste your content and press P to start the teleprompter
@@ -61,4 +61,4 @@ Stop the auto-advance:
 clearInterval(iv)
 ```
 
-`window.__store__` is only available in development mode and will not be present in production builds.
+Note: Web Speech API requires a secure context (HTTPS or localhost). Speech recognition will not work when opening the built HTML file directly from `file://`. The test script above can be used to simulate scrolling in that case.
