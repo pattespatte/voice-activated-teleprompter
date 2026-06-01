@@ -32,6 +32,7 @@ export default {
         /^interim-transcript/,
         /^animate/,
         'is-sr-only',
+        /^meta-info/,
       ],
       // Keep CSS keyframes that might be used
       keyframes: true,

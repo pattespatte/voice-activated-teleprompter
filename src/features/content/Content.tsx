@@ -249,16 +249,27 @@ export const Content = () => {
 
   const metaData = isMarkdown ? parseAllMetadata(rawText) : null
   const [showMeta, setShowMeta] = useState(false)
+  const metaRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!showMeta) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (metaRef.current && !metaRef.current.contains(e.target as Node)) {
+        setShowMeta(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showMeta])
 
   return (
     <main className="content-area">
       {metaData && Object.keys(metaData).length > 0 && status !== "editing" && (
-        <div className="meta-info">
+        <div className="meta-info" ref={metaRef}>
           <button
-            className="meta-info-button"
-            onMouseEnter={() => setShowMeta(true)}
-            onMouseLeave={() => setShowMeta(false)}
+            className={`meta-info-button${showMeta ? " active" : ""}`}
             onClick={() => setShowMeta(!showMeta)}
+            aria-expanded={showMeta}
             aria-label="Show song metadata"
           >
             ℹ
