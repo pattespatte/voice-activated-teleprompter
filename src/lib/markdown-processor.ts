@@ -226,7 +226,7 @@ const CHORD_REGEX_GLOBAL = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add|6|11|
 
 /**
  * Processes chords in ChordPro inline format [G]word.
- * Outputs two visual rows: chord row (monospace, positioned) above lyrics row.
+ * Uses HTML <ruby> elements to position chords above words natively.
  */
 const processChords = (content: string): string => {
   const lines = content.split('\n')
@@ -240,58 +240,64 @@ const processChords = (content: string): string => {
     }
     CHORD_REGEX_GLOBAL.lastIndex = 0
 
-    // Parse chord positions and build lyrics string
-    const chordPositions: { charPos: number; chord: string }[] = []
-    let lyrics = ''
+    let result = ''
     let remaining = line
     let hasChords = false
+    const pendingChords: string[] = []
+
+    const emitRuby = (word: string): string => {
+      const chordText = pendingChords.join(' / ')
+      pendingChords.length = 0
+      hasChords = true
+      return `<ruby>${word}<rt>${chordText}</rt></ruby>`
+    }
 
     while (remaining.length > 0) {
       const match = remaining.match(CHORD_REGEX)
 
       if (!match || match.index === undefined) {
-        lyrics += remaining
+        // No more chords — attach pending chords to first word in remaining
+        if (pendingChords.length > 0) {
+          const wordMatch = remaining.match(/^(\S+)(.*)/)
+          if (wordMatch) {
+            result += emitRuby(wordMatch[1]) + wordMatch[2]
+          } else {
+            result += emitRuby(' ')
+          }
+        } else {
+          result += remaining
+        }
         break
       }
 
-      const chord = match[0].slice(1, -1)
-      lyrics += remaining.substring(0, match.index)
+      // Emit text before the chord
+      if (match.index > 0) {
+        const before = remaining.substring(0, match.index)
+        if (pendingChords.length > 0) {
+          // Attach pending chords to first word in 'before'
+          const wordMatch = before.match(/^(\S+)(.*)/)
+          if (wordMatch && wordMatch[1].length > 0) {
+            result += emitRuby(wordMatch[1]) + wordMatch[2]
+          } else {
+            result += before
+          }
+        } else {
+          result += before
+        }
+      }
+
+      // Buffer the chord
+      pendingChords.push(match[0].slice(1, -1))
+      hasChords = true
       remaining = remaining.substring(match.index + match[0].length)
-
-      // Skip whitespace after chord
-      remaining = remaining.replace(/^\s*/, '')
-
-      const wordMatch = remaining.match(/^(\S+)/)
-      const isWordAChord = wordMatch ? CHORD_REGEX.test(wordMatch[1]) : false
-
-      if (wordMatch && !isWordAChord) {
-        chordPositions.push({ charPos: lyrics.length, chord })
-        lyrics += wordMatch[1]
-        remaining = remaining.substring(wordMatch[1].length)
-        hasChords = true
-      } else {
-        chordPositions.push({ charPos: lyrics.length, chord })
-        hasChords = true
-      }
     }
 
-    if (hasChords) {
-      // Build chord row with spaces to position each chord above its word
-      let chordRow = ''
-      for (const { charPos, chord } of chordPositions) {
-        const spaces = Math.max(0, charPos - chordRow.length)
-        chordRow += ' '.repeat(spaces) + chord
-      }
-
-      processedLines.push(
-        `<span class="has-chords">` +
-        `<span class="chord-row">${chordRow}</span>` +
-        `${lyrics}` +
-        `</span>`
-      )
-    } else {
-      processedLines.push(line)
+    // Handle trailing chords at end of line
+    if (pendingChords.length > 0) {
+      result += emitRuby(' ')
     }
+
+    processedLines.push(hasChords ? `<span class="has-chords">${result}</span>` : line)
   }
 
   return processedLines.join('\n')

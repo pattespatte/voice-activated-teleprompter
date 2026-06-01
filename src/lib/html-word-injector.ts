@@ -102,9 +102,9 @@ export const injectWordSpans = (html: string, textElements: TextElement[]): stri
       // Skip elements where we don't want word wrapping
       // - Headers (h1-h6): "## Verse 1" etc.
       // - Code blocks, pre, style, script
-      // - Chord spans (class="chord"): "[G]", "[C]" etc.
+      // - Ruby annotations (rt): chord names like "G", "C" etc.
       // - Strong (bold) elements like "**Key:**", "**Time:**"
-      const skipTags = ['CODE', 'PRE', 'STYLE', 'SCRIPT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'STRONG']
+      const skipTags = ['CODE', 'PRE', 'STYLE', 'SCRIPT', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'STRONG', 'RT']
       if (skipTags.includes(tagName) || element.classList.contains('chord-row')) {
         return
       }

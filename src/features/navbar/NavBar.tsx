@@ -178,18 +178,6 @@ export const NavBar = () => {
               <>
                 <button
                   type="button"
-                  className={`button is-medium has-text-white ${status === "editing" ? "editing" : ""}`}
-                  onClick={() => dispatch(toggleEdit())}
-                  title="Edit"
-                  aria-label="Edit text"
-                >
-                  <span className="icon">
-                    ✏
-                  </span>
-                  <span className="is-hidden-mobile">Edit</span>
-                </button>
-                <button
-                  type="button"
                   className="button is-medium has-text-white"
                   onClick={() => fileInputRef.current?.click()}
                   title="Upload text file"
@@ -199,6 +187,18 @@ export const NavBar = () => {
                     ⬆
                   </span>
                   <span className="is-hidden-mobile">Upload</span>
+                </button>
+                <button
+                  type="button"
+                  className={`button is-medium has-text-white ${status === "editing" ? "editing" : ""}`}
+                  onClick={() => dispatch(toggleEdit())}
+                  title="Edit"
+                  aria-label="Edit text"
+                >
+                  <span className="icon">
+                    ✏
+                  </span>
+                  <span className="is-hidden-mobile">Edit</span>
                 </button>
                 <input
                   ref={fileInputRef}
