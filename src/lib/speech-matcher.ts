@@ -4,7 +4,8 @@ import { levenshteinDistance } from "./levenshtein"
 // Robust algorithm to match recognized speech to reference text.
 // Uses sliding-window Levenshtein distance comparison instead of prefix matching.
 
-const CONFIDENCE_THRESHOLD = 0.6  // max edit distance as fraction of comparison string length
+const CONFIDENCE_THRESHOLD = 0.50  // max edit distance as fraction of comparison string length — sung text needs generous threshold (slurred, mispronounced)
+const FORWARD_BIAS = 0.15  // per-token penalty for matches behind lastKnownPosition — helps with repeated lyrics
 
 /**
  * Searches for the best matching position using a sliding window approach.
@@ -16,6 +17,7 @@ const findBestMatch = (
   reference: TextElement[],
   startIndex: number,
   windowSize: number,
+  lastKnownPosition: number,
   debug: boolean,
 ): { index: number; distance: number } => {
   const reference_tokens = reference
@@ -32,6 +34,7 @@ const findBestMatch = (
 
   // Sliding window: compare recognized text against each substring of same length
   const distances: number[] = []
+  const adjustedDistances: number[] = []  // distances with forward-position bias applied
   const windowLen = Math.min(recognizedCount, reference_tokens.length)
 
   for (let start = 0; start <= reference_tokens.length - windowLen; start++) {
@@ -42,6 +45,12 @@ const findBestMatch = (
       .trim()
     const dist = levenshteinDistance(comparison_string, reference_substring)
     distances.push(dist)
+
+    // Apply forward bias: penalize matches that would move position backward
+    const matchEndToken = reference_tokens[start + windowLen - 1]
+    const tokensBack = lastKnownPosition - matchEndToken.index
+    const bias = tokensBack > 0 ? tokensBack * FORWARD_BIAS : 0
+    adjustedDistances.push(dist + bias)
   }
 
   // Also try growing prefix from start (helps when recognized is first words)
@@ -53,9 +62,17 @@ const findBestMatch = (
       .trim()
     const dist = levenshteinDistance(comparison_string, prefix)
     distances.push(dist)
+
+    const matchEndToken = reference_tokens[len - 1]
+    const tokensBack = lastKnownPosition - matchEndToken.index
+    const bias = tokensBack > 0 ? tokensBack * FORWARD_BIAS : 0
+    adjustedDistances.push(dist + bias)
   }
 
-  const minDist = Math.min(...distances)
+  // Use adjusted distances for picking best match, raw distances for threshold check
+  const minAdjDist = Math.min(...adjustedDistances)
+  const bestAdjIndex = adjustedDistances.indexOf(minAdjDist)
+  const minDist = distances[bestAdjIndex]  // raw distance at best adjusted position
   const threshold = comparison_string.length * CONFIDENCE_THRESHOLD
 
   if (debug) {
@@ -69,7 +86,7 @@ const findBestMatch = (
     return { index: -1, distance: minDist }
   }
 
-  const bestIndex = distances.indexOf(minDist)
+  const bestIndex = bestAdjIndex
 
   // Map back from distances index to reference token index.
   // Sliding window entries come first, then prefix entries.
@@ -128,14 +145,18 @@ export const computeSpeechRecognitionTokenIndex = (
 
   let startIndex = Math.max(0, lastRecognizedTokenIndex)
 
-  // Step 1: Normal forward search
-  const normalWindow = Math.max(recognized_tokens.length * 3, 30)
+  // Step 1: Normal forward search with lookback for stale context
+  // comparison_string may contain words from before lastRecognizedTokenIndex
+  // (accumulated in recentFinalWords). Include lookback so they can match.
+  const lookback = recognized_tokens.length
+  const normalStart = Math.max(0, startIndex - lookback)
+  const normalWindow = Math.max(recognized_tokens.length * 3, 30) + lookback
   if (debug) {
-    console.log("Normal search: start=", startIndex, "window=", normalWindow)
+    console.log("Normal search: start=", normalStart, "window=", normalWindow)
   }
 
   const normalMatch = findBestMatch(
-    comparison_string, recognized_tokens.length, reference, startIndex, normalWindow, debug,
+    comparison_string, recognized_tokens.length, reference, normalStart, normalWindow, lastRecognizedTokenIndex, debug,
   )
   if (normalMatch.index >= 0) {
     if (debug) console.log("========================")
@@ -143,8 +164,8 @@ export const computeSpeechRecognitionTokenIndex = (
   }
 
   // Step 2: Recovery — wider window including tokens before last position
-  const recoveryLookback = 30
-  const recoveryLookahead = Math.max(recognized_tokens.length * 5, 80)
+  const recoveryLookback = 50
+  const recoveryLookahead = Math.max(recognized_tokens.length * 6, 120)
   const recoveryStart = Math.max(0, startIndex - recoveryLookback)
 
   if (debug) {
@@ -152,7 +173,7 @@ export const computeSpeechRecognitionTokenIndex = (
   }
 
   const recoveryMatch = findBestMatch(
-    comparison_string, recognized_tokens.length, reference, recoveryStart, recoveryLookback + recoveryLookahead, debug,
+    comparison_string, recognized_tokens.length, reference, recoveryStart, recoveryLookback + recoveryLookahead, lastRecognizedTokenIndex, debug,
   )
   if (recoveryMatch.index >= 0) {
     if (debug) console.log("========================")

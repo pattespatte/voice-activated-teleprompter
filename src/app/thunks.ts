@@ -12,7 +12,7 @@ let speechRecognizer: SpeechRecognizer | null = null
 // Accumulate recent recognized words for more robust matching.
 // Chrome's continuous mode delivers short chunks; without context,
 // the matcher can't reliably place 1-3 word fragments in a long song.
-const RECENT_WORDS_MAX = 20
+const RECENT_WORDS_MAX = 40
 let recentFinalWords: string[] = []
 
 export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
@@ -55,7 +55,8 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
         )
         dispatch(setFinalTranscriptIndex(finalTranscriptIndex - 1))
 
-        // Trim history after a successful advance to keep context fresh
+        // Trim history after a successful advance — keep enough context for disambiguation
+        // but not so much that stale words inflate the comparison string
         if (finalTranscriptIndex > lastFinalTranscriptIndex) {
           recentFinalWords = recentFinalWords.slice(-5)
         }

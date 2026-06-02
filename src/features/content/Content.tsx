@@ -60,11 +60,40 @@ export const Content = () => {
   // Store the last scroll position to ensure we never scroll backward
   const lastScrollPositionRef = useRef<number>(0);
 
+  // Target scroll position for smooth interpolation
+  const targetScrollRef = useRef<number>(0);
+  const animatingRef = useRef<boolean>(false);
+
   // Track previous transcript index to detect click jumps (backward navigation)
   const prevTranscriptIndexRef = useRef<number>(-1);
 
   // Track last highlighted index for efficient markdown highlighting updates
   const lastHighlightedIndexRef = useRef<number>(-1);
+  const maxEverHighlightedRef = useRef<number>(-1);
+  const prevFinalIndexRef = useRef<number>(-1);
+  const prevInterimIndexRef = useRef<number>(-1);
+
+  // Smooth scroll animation using lerp
+  const animateScroll = () => {
+    if (!containerRef.current) {
+      animatingRef.current = false;
+      return;
+    }
+    const current = containerRef.current.scrollTop;
+    const target = targetScrollRef.current;
+    const diff = target - current;
+
+    // Close enough — snap to target
+    if (Math.abs(diff) < 1) {
+      containerRef.current.scrollTop = target;
+      animatingRef.current = false;
+      return;
+    }
+
+    // Lerp: move 20% of remaining distance per frame
+    containerRef.current.scrollTop = current + diff * 0.2;
+    requestAnimationFrame(animateScroll);
+  };
 
   useEffect(() => {
     if (containerRef.current) {
@@ -80,6 +109,7 @@ export const Content = () => {
       if (isClickJump || (maxScrollIndexRef.current > 10 && currentTranscriptIndex < maxScrollIndexRef.current - 10)) {
         maxScrollIndexRef.current = Math.min(currentTranscriptIndex, -1);
         lastScrollPositionRef.current = 0;
+        animatingRef.current = false;
       }
 
       // Update previous index for next comparison
@@ -122,13 +152,26 @@ export const Content = () => {
           }
           lastScrollPositionRef.current = actualScrollPosition;
 
-          containerRef.current.scrollTo({
-            top: actualScrollPosition,
-            behavior: "auto",
-          })
+          if (isClickJump) {
+            // Click jumps: instant scroll
+            containerRef.current.scrollTo({
+              top: actualScrollPosition,
+              behavior: "auto",
+            })
+            targetScrollRef.current = actualScrollPosition;
+          } else {
+            // Forward progression: smooth interpolated scroll
+            targetScrollRef.current = actualScrollPosition;
+            if (!animatingRef.current) {
+              animatingRef.current = true;
+              requestAnimationFrame(animateScroll);
+            }
+          }
         }
       } else if (currentTranscriptIndex < 0 && maxScrollIndexRef.current < 0) {
         lastScrollPositionRef.current = 0;
+        targetScrollRef.current = 0;
+        animatingRef.current = false;
         containerRef.current.scrollTo({
           top: 0,
           behavior: "auto",
@@ -137,7 +180,7 @@ export const Content = () => {
     }
   }, [scrollOffset, finalTranscriptIndex, interimTranscriptIndex, textElements, isMarkdown])
 
-  // Efficient markdown highlighting - only update spans that changed
+  // Efficient markdown highlighting - additive only, never blinks
   useEffect(() => {
     if (!isMarkdown || !containerRef.current) {
       return
@@ -151,45 +194,75 @@ export const Content = () => {
       return
     }
 
-    // Determine which word should be highlighted
-    const highlightUpTo = Math.max(finalIndex, interimIndex)
-    if (highlightUpTo === lastHighlightedIndexRef.current) {
+    // Detect click jumps (large backward jump) — only time we clear highlighting
+    const prevFinal = prevFinalIndexRef.current
+    const prevInterim = prevInterimIndexRef.current
+    const prevMax = Math.max(prevFinal, prevInterim)
+    const currentMax = Math.max(finalIndex, interimIndex)
+    const isClickJump = currentMax < prevMax - 5
+
+    prevFinalIndexRef.current = finalIndex
+    prevInterimIndexRef.current = interimIndex
+
+    // Skip if nothing changed
+    if (finalIndex === prevFinal && interimIndex === prevInterim) {
       return
     }
 
-    const lastIndex = lastHighlightedIndexRef.current
-    lastHighlightedIndexRef.current = highlightUpTo
-
-    // Clear all highlighting when going backward
-    if (highlightUpTo < lastIndex) {
+    // On click jump backward, reset and rebuild highlighting up to new position
+    if (isClickJump) {
+      maxEverHighlightedRef.current = -1
       const allSpans = containerRef.current.querySelectorAll('[data-word-index]')
       allSpans.forEach(span => {
         span.classList.remove('final-transcript', 'interim-transcript')
       })
     }
 
-    // data-word-index values come from textElement.index (may have gaps due to delimiters)
-    // Highlight all spans whose index is within the recognized range
-    const highlightThreshold = highlightUpTo + 1
-    const lastThreshold = lastIndex < 0 ? -1 : lastIndex + 1
+    // Track the highest we've ever highlighted — gray stays permanently
+    const highlightUpTo = Math.max(finalIndex, interimIndex)
+    const newMax = Math.max(maxEverHighlightedRef.current, highlightUpTo)
+    const oldMax = maxEverHighlightedRef.current
+    maxEverHighlightedRef.current = newMax
+    lastHighlightedIndexRef.current = highlightUpTo
+
+    const container = containerRef.current
+    const highlightThreshold = newMax + 1
+    const prevThreshold = oldMax < 0 ? -1 : oldMax + 1
     const interimTarget = interimIndex + 1
 
-    const allSpans = containerRef.current.querySelectorAll('[data-word-index]')
+    // Only touch spans in the newly highlighted range (oldMax → newMax)
+    const allSpans = container.querySelectorAll('[data-word-index]')
     allSpans.forEach(span => {
       const idx = parseInt(span.getAttribute('data-word-index') || '-1', 10)
       if (idx < 0) return
 
-      // Clear classes for spans that need re-evaluation
-      if (idx > lastThreshold && idx <= highlightThreshold) {
-        span.classList.remove('final-transcript', 'interim-transcript')
-
-        if (interimIndex >= 0 && idx === interimTarget) {
-          span.classList.add('interim-transcript')
-        } else if (finalIndex >= 0 && idx <= highlightThreshold) {
-          span.classList.add('final-transcript')
-        }
+      if (idx > prevThreshold && idx <= highlightThreshold) {
+        // New span entering highlighted range
+        span.classList.remove('interim-transcript')
+        span.classList.add('final-transcript')
       }
     })
+
+    // Handle interim highlight: move the yellow "current word" marker
+    // First remove previous interim highlight
+    const prevInterimTarget = prevInterim + 1
+    const prevInterimSpan = container.querySelector(`[data-word-index="${prevInterimTarget}"]`)
+    if (prevInterimSpan && prevInterimTarget !== interimTarget) {
+      prevInterimSpan.classList.remove('interim-transcript')
+      // Re-add final-transcript if within range
+      if (prevInterimTarget <= highlightThreshold) {
+        prevInterimSpan.classList.add('final-transcript')
+      }
+    }
+
+    // Set new interim highlight
+    if (interimIndex >= 0) {
+      const interimSpan = container.querySelector(`[data-word-index="${interimTarget}"]`)
+      if (interimSpan) {
+        interimSpan.classList.remove('final-transcript')
+        interimSpan.classList.add('interim-transcript')
+      }
+    }
   }, [finalTranscriptIndex, interimTranscriptIndex, isMarkdown])
 
   useLayoutEffect(() => {
