@@ -1,8 +1,97 @@
 import { type TextElement, tokenize } from "./word-tokenizer"
 import { levenshteinDistance } from "./levenshtein"
 
-// This is the "secret sauce" of this whole project: a robust algorithm to match
-// the reference text and the speech recognized text using the levenshtein distance.
+// Robust algorithm to match recognized speech to reference text.
+// Uses sliding-window Levenshtein distance comparison instead of prefix matching.
+
+const CONFIDENCE_THRESHOLD = 0.6  // max edit distance as fraction of comparison string length
+
+/**
+ * Searches for the best matching position using a sliding window approach.
+ * Compares the recognized text against each same-length substring in the reference.
+ */
+const findBestMatch = (
+  comparison_string: string,
+  recognizedCount: number,
+  reference: TextElement[],
+  startIndex: number,
+  windowSize: number,
+  debug: boolean,
+): { index: number; distance: number } => {
+  const reference_tokens = reference
+    .slice(startIndex, startIndex + windowSize)
+    .filter(element => element.type === "TOKEN")
+
+  if (reference_tokens.length === 0) {
+    return { index: -1, distance: Infinity }
+  }
+
+  if (debug) {
+    console.log("  reference_tokens:", reference_tokens.slice(0, 20).map(t => t.value).join(" ") + (reference_tokens.length > 20 ? "..." : ""))
+  }
+
+  // Sliding window: compare recognized text against each substring of same length
+  const distances: number[] = []
+  const windowLen = Math.min(recognizedCount, reference_tokens.length)
+
+  for (let start = 0; start <= reference_tokens.length - windowLen; start++) {
+    const reference_substring = reference_tokens
+      .slice(start, start + windowLen)
+      .reduce((acc, tok) => acc + " " + tok.value, "")
+      .replace(/\s+/, " ")
+      .trim()
+    const dist = levenshteinDistance(comparison_string, reference_substring)
+    distances.push(dist)
+  }
+
+  // Also try growing prefix from start (helps when recognized is first words)
+  for (let len = 1; len <= Math.min(recognizedCount * 2, reference_tokens.length); len++) {
+    const prefix = reference_tokens
+      .slice(0, len)
+      .reduce((acc, tok) => acc + " " + tok.value, "")
+      .replace(/\s+/, " ")
+      .trim()
+    const dist = levenshteinDistance(comparison_string, prefix)
+    distances.push(dist)
+  }
+
+  const minDist = Math.min(...distances)
+  const threshold = comparison_string.length * CONFIDENCE_THRESHOLD
+
+  if (debug) {
+    console.log("  Min distance:", minDist, "Threshold:", threshold.toFixed(1))
+  }
+
+  if (minDist > threshold) {
+    if (debug) {
+      console.log("  Match rejected — below confidence threshold")
+    }
+    return { index: -1, distance: minDist }
+  }
+
+  const bestIndex = distances.indexOf(minDist)
+
+  // Map back from distances index to reference token index.
+  // Sliding window entries come first, then prefix entries.
+  const slidingCount = reference_tokens.length - windowLen + 1
+  let token: TextElement
+
+  if (bestIndex < slidingCount) {
+    // Match is in the sliding window — the matched substring ends at bestIndex + windowLen - 1
+    token = reference_tokens[bestIndex + windowLen - 1]
+  } else {
+    // Match is in the prefix section
+    const prefixLen = bestIndex - slidingCount + 1
+    token = reference_tokens[prefixLen - 1]
+  }
+
+  if (debug) {
+    console.log("  Best match index:", bestIndex, "→ token index:", token.index)
+  }
+
+  return { index: token.index, distance: minDist }
+}
+
 export const computeSpeechRecognitionTokenIndex = (
   recognized: string,
   reference: TextElement[],
@@ -16,7 +105,6 @@ export const computeSpeechRecognitionTokenIndex = (
     console.log("lastRecognizedTokenIndex:", lastRecognizedTokenIndex)
   }
 
-  // Tokenize the recognized input:
   const recognized_tokens = tokenize(recognized).filter(
     element => element.type === "TOKEN",
   )
@@ -25,12 +113,12 @@ export const computeSpeechRecognitionTokenIndex = (
     console.log("recognized_tokens:", recognized_tokens.map(t => t.value))
   }
 
-  // Convert the tokens back to a string:
+  if (recognized_tokens.length === 0) {
+    return lastRecognizedTokenIndex
+  }
+
   const comparison_string = recognized_tokens
-    .reduce(
-      (accumulator, currentToken) => accumulator + " " + currentToken.value,
-      "",
-    )
+    .reduce((acc, tok) => acc + " " + tok.value, "")
     .replace(/\s+/, " ")
     .trim()
 
@@ -38,66 +126,41 @@ export const computeSpeechRecognitionTokenIndex = (
     console.log("comparison_string:", comparison_string)
   }
 
-  if (lastRecognizedTokenIndex < 0) {
-    lastRecognizedTokenIndex = 0
+  let startIndex = Math.max(0, lastRecognizedTokenIndex)
+
+  // Step 1: Normal forward search
+  const normalWindow = Math.max(recognized_tokens.length * 3, 30)
+  if (debug) {
+    console.log("Normal search: start=", startIndex, "window=", normalWindow)
   }
 
-  // Now, let's pick the next few tokens from the reference text starting at the last recognized token index.
-  // To simplify, we'll pluck recognized_tokens.length * 2 + 10, and we'll filter out the delimiters:
-  const reference_tokens = reference
-    .slice(
-      lastRecognizedTokenIndex,
-      lastRecognizedTokenIndex + recognized_tokens.length * 2 + 10,
-    )
-    .filter(element => element.type === "TOKEN")
+  const normalMatch = findBestMatch(
+    comparison_string, recognized_tokens.length, reference, startIndex, normalWindow, debug,
+  )
+  if (normalMatch.index >= 0) {
+    if (debug) console.log("========================")
+    return normalMatch.index
+  }
+
+  // Step 2: Recovery — wider window including tokens before last position
+  const recoveryLookback = 30
+  const recoveryLookahead = Math.max(recognized_tokens.length * 5, 80)
+  const recoveryStart = Math.max(0, startIndex - recoveryLookback)
 
   if (debug) {
-    console.log("reference_tokens:", reference_tokens.map(t => t.value))
+    console.log("Recovery search: start=", recoveryStart, "window=", recoveryLookback + recoveryLookahead)
   }
 
-  // Now, compute the levenshtein distances between the comparison string
-  // and each possible substring created from the reference tokens:
-  const distances: number[] = []
-
-  let i = 0
-
-  while (++i <= reference_tokens.length) {
-    const reference_substring = reference_tokens
-      .slice(0, i)
-      .reduce(
-        (accumulator, currentToken) => accumulator + " " + currentToken.value,
-        "",
-      )
-      .replace(/\s+/, " ")
-      .trim()
-    const dist = levenshteinDistance(comparison_string, reference_substring)
-    distances.push(dist)
-    if (debug) {
-      console.log(`  Distance to "${reference_substring}": ${dist}`)
-    }
-  }
-
-  // Find the index of the minimum distance:
-  const index = distances.indexOf(Math.min(...distances))
-
-  if (debug) {
-    console.log("Minimum distance:", Math.min(...distances))
-    console.log("Best match index:", index)
-  }
-
-  // Trace that back to the token object:
-  const token = reference_tokens[index]
-
-  if (token) {
-    if (debug) {
-      console.log("Returning token index:", token.index)
-      console.log("========================")
-    }
-    return token.index
+  const recoveryMatch = findBestMatch(
+    comparison_string, recognized_tokens.length, reference, recoveryStart, recoveryLookback + recoveryLookahead, debug,
+  )
+  if (recoveryMatch.index >= 0) {
+    if (debug) console.log("========================")
+    return recoveryMatch.index
   }
 
   if (debug) {
-    console.log("No token found, returning last index:", lastRecognizedTokenIndex)
+    console.log("No confident match found, staying at:", lastRecognizedTokenIndex)
     console.log("========================")
   }
   return lastRecognizedTokenIndex

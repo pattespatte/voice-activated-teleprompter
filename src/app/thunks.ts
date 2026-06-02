@@ -9,8 +9,15 @@ import { computeSpeechRecognitionTokenIndex } from "../lib/speech-matcher"
 
 let speechRecognizer: SpeechRecognizer | null = null
 
+// Accumulate recent recognized words for more robust matching.
+// Chrome's continuous mode delivers short chunks; without context,
+// the matcher can't reliably place 1-3 word fragments in a long song.
+const RECENT_WORDS_MAX = 20
+let recentFinalWords: string[] = []
+
 export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
   dispatch(start())
+  recentFinalWords = []
 
   const { language } = getState().navbar
   speechRecognizer = new SpeechRecognizer(language)
@@ -31,17 +38,35 @@ export const startTeleprompter = (): AppThunk => (dispatch, getState) => {
       } = getState().content
 
       if (final_transcript !== "") {
+        // Add new words to the recent history
+        const newWords = final_transcript.trim().split(/\s+/).filter(w => w.length > 0)
+        recentFinalWords.push(...newWords)
+        // Keep only the most recent words
+        if (recentFinalWords.length > RECENT_WORDS_MAX) {
+          recentFinalWords = recentFinalWords.slice(-RECENT_WORDS_MAX)
+        }
+
+        // Match using accumulated context for better accuracy
+        const contextString = recentFinalWords.join(" ")
         const finalTranscriptIndex = computeSpeechRecognitionTokenIndex(
-          final_transcript,
+          contextString,
           textElements,
           lastFinalTranscriptIndex,
         )
         dispatch(setFinalTranscriptIndex(finalTranscriptIndex - 1))
+
+        // Trim history after a successful advance to keep context fresh
+        if (finalTranscriptIndex > lastFinalTranscriptIndex) {
+          recentFinalWords = recentFinalWords.slice(-5)
+        }
       }
 
       if (interim_transcript !== "") {
+        // Combine recent final + current interim for real-time tracking
+        const interimWords = interim_transcript.trim().split(/\s+/).filter(w => w.length > 0)
+        const combined = [...recentFinalWords, ...interimWords].join(" ")
         const interimTranscriptIndex = computeSpeechRecognitionTokenIndex(
-          interim_transcript,
+          combined,
           textElements,
           lastFinalTranscriptIndex,
         )
@@ -59,6 +84,7 @@ export const stopTeleprompter = (): AppThunk => dispatch => {
     speechRecognizer = null
   }
 
+  recentFinalWords = []
   dispatch(stop())
 }
 
