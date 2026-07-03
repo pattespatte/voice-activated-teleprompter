@@ -2,6 +2,8 @@
 
 *Based on [original code by Julien Lecomte](https://github.com/jlecomte/voice-activated-teleprompter)*
 
+**[Live demo](https://pattespatte.github.io/voice-activated-teleprompter/)**
+
 Julien's intro:
 
 > This web-based single-page application (SPA) is a voice-activated teleprompter, i.e., it automatically scrolls the text you are reading as you are reading it. It is built using [Vite](https://vitejs.dev/), [React](https://react.dev/), [Redux](https://redux.js.org/), and [TypeScript](https://www.typescriptlang.org/). I routinely use it with my [Elgato Prompter](https://www.elgato.com/us/en/p/prompter) to create [my own YouTube videos](https://www.youtube.com/@darkskygeek). Such software already exists, but it is either rather expensive, or not robust enough. For example, the free online software created by Teleprompter Mirror [[link](https://telepromptermirror.com/telepromptersoftware.htm)] easily gets confused if you go off script or mispronounce too many words, and as a result, it will stop auto-scrolling. This is why I built this app.
