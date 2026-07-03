@@ -11,6 +11,10 @@ export interface ContentSliceState {
   interimTranscriptIndex: number
   isMarkdown: boolean
   processedHtml: string
+  // ChordPro detection confirmation: lets the user override a false-positive
+  // detection. Both reset on every setContent.
+  chordProRejected: boolean
+  chordProDismissed: boolean
 }
 
 // Translations for the initial text in all supported languages
@@ -52,6 +56,8 @@ const initialState: ContentSliceState = {
   interimTranscriptIndex: -1,
   isMarkdown: false,
   processedHtml: "",
+  chordProRejected: false,
+  chordProDismissed: false,
 }
 
 export const contentSlice = createAppSlice({
@@ -65,7 +71,7 @@ export const contentSlice = createAppSlice({
     setContent: create.reducer((state, action: PayloadAction<{ content: string; isMarkdown?: boolean } | string>) => {
       let content: string
       let isMarkdownFile = false
-      
+
       if (typeof action.payload === 'string') {
         content = action.payload
         isMarkdownFile = isMarkdownContent(content)
@@ -73,7 +79,11 @@ export const contentSlice = createAppSlice({
         content = action.payload.content
         isMarkdownFile = action.payload.isMarkdown ?? isMarkdownContent(content)
       }
-      
+
+      // New content: re-evaluate detection confirmation from scratch.
+      state.chordProRejected = false
+      state.chordProDismissed = false
+
       state.rawText = content
       state.isMarkdown = isMarkdownFile
       
@@ -106,6 +116,21 @@ export const contentSlice = createAppSlice({
     ),
 
     resetTranscriptionIndices: create.reducer(state => {
+      state.finalTranscriptIndex = -1
+      state.interimTranscriptIndex = -1
+    }),
+
+    // User accepted the ChordPro detection: keep markdown rendering, hide banner.
+    confirmChordPro: create.reducer(state => {
+      state.chordProDismissed = true
+    }),
+
+    // User rejected the detection: re-render as plain text.
+    rejectChordPro: create.reducer(state => {
+      state.chordProRejected = true
+      state.isMarkdown = false
+      state.processedHtml = ""
+      state.textElements = tokenize(state.rawText)
       state.finalTranscriptIndex = -1
       state.interimTranscriptIndex = -1
     }),
@@ -146,6 +171,8 @@ export const contentSlice = createAppSlice({
     selectInterimTranscriptIndex: state => state.interimTranscriptIndex,
     selectIsMarkdown: state => state.isMarkdown,
     selectProcessedHtml: state => state.processedHtml,
+    selectChordProRejected: state => state.chordProRejected,
+    selectChordProDismissed: state => state.chordProDismissed,
   },
 })
 
@@ -155,6 +182,8 @@ export const {
   setInterimTranscriptIndex,
   resetTranscriptionIndices,
   updateInitialTextForLanguage,
+  confirmChordPro,
+  rejectChordPro,
 } = contentSlice.actions
 
 export const {
@@ -164,4 +193,6 @@ export const {
   selectInterimTranscriptIndex,
   selectIsMarkdown,
   selectProcessedHtml,
+  selectChordProRejected,
+  selectChordProDismissed,
 } = contentSlice.selectors

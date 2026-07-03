@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { NavBar } from "./features/navbar/NavBar"
 import { Content } from "./features/content/Content"
+import { ChordProConfirmBanner } from "./features/content/ChordProConfirmBanner"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { startTeleprompter, stopTeleprompter } from "./app/thunks"
 import { selectStatus } from "./features/navbar/navbarSlice"
@@ -61,6 +62,7 @@ const App = () => {
   return (
     <div className="app">
       <NavBar />
+      <ChordProConfirmBanner />
       <Content />
     </div>
   )

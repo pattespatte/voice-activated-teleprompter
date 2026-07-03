@@ -8,11 +8,13 @@ marked.setOptions({
   gfm: true, // Enable GitHub Flavored Markdown
 })
 
-const FRONTMATTER_REGEX = /^---\n([\s\S]*?)\n---\n?/
+const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/
 
 // ChordPro directive patterns
 // Matches: {directive: value}, {directive value}, {directive}
-const DIRECTIVE_REGEX = /^\s*\{(\w+)\s*(?::\s*(.*?))?\s*\}\s*$/
+// The `m` flag lets it match a directive on any line, not just when the
+// whole content is a single directive.
+const DIRECTIVE_REGEX = /^\s*\{(\w+)\s*(?::\s*(.*?))?\s*\}\s*$/m
 /**
  * Strips YAML frontmatter (---...---) from content
  */
@@ -148,6 +150,9 @@ const stripChordProDirectives = (content: string): string => {
  * or ChordPro directives
  */
 export const isMarkdownContent = (content: string): boolean => {
+  // YAML frontmatter (--- ... ---) counts on its own; check before stripping.
+  if (FRONTMATTER_REGEX.test(content)) return true
+
   const stripped = stripFrontmatter(content)
 
   // Check for ChordPro directives
@@ -163,9 +168,23 @@ export const isMarkdownContent = (content: string): boolean => {
     /^\s*[-*+]\s+/m, // Unordered lists
     /^\s*\d+\.\s+/m, // Ordered lists
     /^>\s+/m, // Blockquotes
+    CHORD_REGEX, // ChordPro inline chords [G], [Cmaj7], etc.
   ]
 
   return markdownPatterns.some(pattern => pattern.test(stripped))
+}
+
+/**
+ * Narrower check used to decide whether to show the "ChordPro syntax detected"
+ * confirmation banner. Returns true only for ChordPro markers or YAML
+ * frontmatter — not for plain markdown (headers, bold, …).
+ */
+export const hasChordProOrFrontmatter = (content: string): boolean => {
+  return (
+    FRONTMATTER_REGEX.test(content)
+    || DIRECTIVE_REGEX.test(stripFrontmatter(content))
+    || CHORD_REGEX.test(content)
+  )
 }
 
 /**
