@@ -42,5 +42,30 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      # GitHub's Pages backend intermittently fails the first deploy with a
+      # transient "Deployment failed, try again later." A manual re-run then
+      # succeeds. Retry automatically so it doesn't need human intervention.
+      - name: Deploy to GitHub Pages (attempt 1)
+        id: deploy-1
         uses: actions/deploy-pages@v5
+        continue-on-error: true
+
+      - name: Wait before retry
+        if: steps.deploy-1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Deploy to GitHub Pages (retry)
+        id: deploy-2
+        if: steps.deploy-1.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+
+      - name: Publish deployment URL (and fail if both attempts failed)
+        id: deployment
+        if: always()
+        run: |
+          url="${{ steps.deploy-2.outputs.page_url || steps.deploy-1.outputs.page_url }}"
+          echo "page_url=$url" >> "$GITHUB_OUTPUT"
+          if [ -z "$url" ]; then
+            echo "Both deploy attempts failed."
+            exit 1
+          fi
