@@ -73,8 +73,13 @@ $cyan: hsl(198, 100%, 70%);
   font-size: 1.5rem;
 }
 
+.is-size-6 {
+  font-size: 0.6rem;
+  line-height: 0.3rem;
+}
+
 .is-size-7 {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 // Display helpers
@@ -337,7 +342,7 @@ body {
 .navbar-item {
   display: flex;
   align-items: center;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem;
   position: relative;
   flex-grow: 0;
   flex-shrink: 0;
@@ -400,7 +405,7 @@ body {
   right: 0;
   top: 0;
   width: 3.5rem;
-  height: 3.75rem;
+  height: 3.25rem;
   padding: 0;
   align-items: center;
   justify-content: center;
@@ -415,7 +420,7 @@ body {
     width: 1.25rem;
     height: 2px;
     background-color: $white;
-    margin: 4px 0;
+    margin: 3px 0;
     transition: all 0.2s ease;
   }
 }

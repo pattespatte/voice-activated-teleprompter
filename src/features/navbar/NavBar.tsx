@@ -164,7 +164,7 @@ export const NavBar = () => {
           <div className="title has-text-grey">
             <div className="is-hidden-mobile">Voice-Activated Teleprompter</div>
             <div className="is-hidden-desktop is-hidden-tablet">Teleprompter</div>
-            <div className="is-size-7 is-hidden-mobile first">
+            <div className="is-size-6 is-hidden-mobile first">
               <a href="https://github.com/jlecomte/voice-activated-teleprompter" className="has-text-link-light has-text-weight-normal">Based on original code by Julien Lecomte</a>
             </div>
           </div>
