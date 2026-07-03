@@ -370,6 +370,7 @@ export const Content = () => {
           value={rawText}
           onChange={e => dispatch(setContent(e.target.value || ""))}
           placeholder="Enter your teleprompter text here..."
+          autoFocus
         />
       ) : (
         <div

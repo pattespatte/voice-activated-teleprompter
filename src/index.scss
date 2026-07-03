@@ -238,6 +238,24 @@ $cyan: hsl(198, 100%, 70%);
   }
 }
 
+// Edit mode: dim and disable the non-Edit buttons so the active
+// "Editing" button stands out as the way to finish editing.
+.navbar .buttons.editing-mode .button:not(.editing) {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+// Promote the Edit button as the exit call-to-action while editing.
+.navbar .buttons .button.editing {
+  transform: scale(1.08);
+  border-color: $cyan;
+  color: $white;
+
+  .is-italic {
+    font-style: italic;
+  }
+}
+
 // Font family
 body,
 button,

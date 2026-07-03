@@ -173,7 +173,7 @@ export const NavBar = () => {
 
       <div className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-end">
-          <div className="buttons navbar-item">
+          <div className={`buttons navbar-item${status === "editing" ? " editing-mode" : ""}`}>
             {status !== "started" ? (
               <>
                 <button
@@ -198,7 +198,9 @@ export const NavBar = () => {
                   <span className="icon">
                     ✏
                   </span>
-                  <span className="is-hidden-mobile">Edit</span>
+                  <span className={`is-hidden-mobile${status === "editing" ? " is-italic" : ""}`}>
+                    {status === "editing" ? "Save" : "Edit"}
+                  </span>
                 </button>
                 <input
                   ref={fileInputRef}
