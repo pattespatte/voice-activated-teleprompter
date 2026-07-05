@@ -122,7 +122,7 @@ import { setContent } from "./contentSlice"
 - `src/features/{featureName}/` - Feature slices and components:
   - `content/` - `Content.tsx`, `contentSlice.ts`, `ChordProConfirmBanner.tsx`
   - `navbar/` - `NavBar.tsx`, `navbarSlice.ts`
-  - `debug/` - `DebugPanel.tsx`, `debugSlice.ts` (work in progress; **not yet wired into the store**)
+  - `debug/` - `DebugPanel.tsx`, `debugSlice.ts` (dev tool for simulating speech input)
 - `src/lib/` - Pure utilities and helpers:
   - `word-tokenizer.ts` - Splits text into `TextElement[]` (tokens vs delimiters)
   - `speech-recognizer.ts` - Wraps the Web Speech API lifecycle
