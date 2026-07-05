@@ -952,7 +952,7 @@ textarea:focus {
   }
 
   .button {
-    border: 2px solid hsl(221, 14%, 48%)-light;
+    border: 2px solid $grey-light;
   }
 
   .content>span {
@@ -1056,7 +1056,7 @@ textarea:focus {
 
   h6 {
     font-size: 0.9em;
-    color: hsl(221, 14%, 48%)-light;
+    color: $grey-light;
   }
 
   /* Text formatting */
@@ -1094,7 +1094,7 @@ textarea:focus {
 
   pre {
     background-color: hsl(221, 14%, 21%);
-    border: 1px solid hsl(221, 14%, 48%)-dark;
+    border: 1px solid $grey-dark;
     border-radius: 4px;
     padding: 1em;
     overflow-x: auto;
@@ -1125,7 +1125,7 @@ textarea:focus {
     margin: 1em 0;
     padding: 0.5em 1em;
     background-color: hsl(221, 14%, 21%);
-    color: hsl(221, 14%, 48%)-light;
+    color: $grey-light;
     font-style: italic;
 
     p {
@@ -1141,7 +1141,7 @@ textarea:focus {
 
     th,
     td {
-      border: 1px solid hsl(221, 14%, 48%)-dark;
+      border: 1px solid $grey-dark;
       padding: 0.5em;
       text-align: left;
     }
@@ -1164,7 +1164,7 @@ textarea:focus {
   /* Horizontal rule */
   hr {
     border: none;
-    border-top: 1px solid hsl(221, 14%, 48%)-dark;
+    border-top: 1px solid $grey-dark;
     margin: 2em 0;
   }
 
@@ -1296,14 +1296,14 @@ textarea:focus {
 }
 
 .debug-description {
-  color: hsl(221, 14%, 48%)-light;
+  color: $grey-light;
   font-size: 0.9rem;
   margin: 0;
 }
 
 .debug-textarea {
   background-color: hsl(221, 14%, 4%);
-  border: 1px solid hsl(221, 14%, 48%)-dark;
+  border: 1px solid $grey-dark;
   border-radius: 4px;
   color: hsl(221, 14%, 100%);
   font-family: inherit;
@@ -1330,7 +1330,7 @@ textarea:focus {
 }
 
 .debug-info {
-  color: hsl(221, 14%, 48%)-light;
+  color: $grey-light;
   font-size: 0.85rem;
 
   small {
