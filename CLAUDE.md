@@ -81,7 +81,7 @@ Text flows through multiple processing stages:
 The app builds to a single HTML file using:
 
 - `vite-plugin-singlefile` - Inlines all CSS and JS
-- Custom Vite plugins in `/src/plugins/` - Fix crossorigin issues, CSS padding problems
+- Custom Vite plugins defined inline in `/vite.config.ts` (e.g. `fixStyleCrossorigin`) - strip crossorigin attributes from inlined styles, fix invalid `padding: auto`
 - PostCSS with PurgeCSS
 
 See `/vite.config.ts` for build configuration.
@@ -90,7 +90,7 @@ See `/vite.config.ts` for build configuration.
 
 Supports 7 languages: English, French, German, Italian, Portuguese, Spanish, Swedish.
 
-Browser language detection with localStorage persistence. Placeholder text is translated in `/src/lib/placeholder-text.ts`.
+Browser language detection with localStorage persistence. The translated initial/placeholder text lives in `/src/features/content/contentSlice.ts`.
 
 ### Key Files
 
@@ -98,8 +98,8 @@ Browser language detection with localStorage persistence. Placeholder text is tr
 - `/src/App.tsx` - Main component, keyboard shortcuts (P key for play/pause)
 - `/src/features/navbar/NavBar.tsx` - Controls and settings UI
 - `/src/features/content/Content.tsx` - Text display and scrolling logic
-- `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection
-- `/src/lib/chord-processor.ts` - Handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.)
+- `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection; also handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.) positioned above lyrics
+- `/src/features/content/ChordProConfirmBanner.tsx` - Paste-detection banner that confirms ChordPro conversion
 
 ### Language Support Note
 
