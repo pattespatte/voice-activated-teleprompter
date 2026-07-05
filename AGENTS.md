@@ -2,36 +2,57 @@
 
 This document provides guidelines for agentic coding assistants working on this repository.
 
+## Project Overview
+
+**Voice-Activated Teleprompter** — a Vite + React 19 + Redux Toolkit + TypeScript
+single-page app that auto-scrolls text as you read aloud, using the Web Speech API.
+Based on [Julien Lecomte's original](https://github.com/jlecomte/voice-activated-teleprompter).
+
+The production build is bundled into a **single self-contained HTML file** (CSS, JS,
+and assets inlined) via `vite-plugin-singlefile`. See [Build Output](#build-output)
+for why this matters when editing code and styles.
+
 ## Build, Lint, and Test Commands
+
+> **Package manager:** `bun` is the preferred runner (consistent with `README.md`,
+> `CLAUDE.md`, and the global ZCode preference). `npm` also works — the repo ships a
+> `package-lock.json`. (Note: `package.json` declares `yarn` as `packageManager`, but
+> there is no `yarn.lock`; this is contradictory legacy metadata, not a real yarn setup.)
 
 ### Core Commands
 
-- `npm run dev` - Start Vite dev server (<http://localhost:5173>)
-- `npm run build` - Type-check and build for production
-- `npm run preview` - Preview production build locally
-- `npm run test` - Run Playwright tests (starts dev server automatically)
+- `bun run dev` — Start Vite dev server (<http://localhost:5173>)
+- `bun run build` — Type-check (`tsc`) and build the single-file production bundle
+- `bun run preview` — Preview the production build locally
+- `bun run test` — Run Playwright tests (starts the dev server automatically via `webServer`)
 
 ### Linting and Formatting
 
-- `npm run lint` - Run ESLint checks
-- `npm run lint:fix` - Auto-fix ESLint issues
-- `npm run type-check` - Run TypeScript type checking without emitting
-- `npm run format` - Format code with Prettier
+- `bun run lint` — Run ESLint checks
+- `bun run lint:fix` — Auto-fix ESLint issues
+- `bun run type-check` — Run TypeScript type checking without emitting
+- `bun run format` — Format code with Prettier
+
+> **ESLint config:** ESLint 9 flat config in `eslint.config.js` is active. The legacy
+> `.eslintrc.json` is unused and can be ignored (do not rely on it). A notable rule is
+> enforced via `@typescript-eslint/no-restricted-imports`: **never** import
+> `useSelector` / `useStore` / `useDispatch` from `react-redux` directly — use the
+> pre-typed hooks from `src/app/hooks.ts`.
 
 ### Running Single Tests
 
-Playwright tests run via `npm run test`. To run a specific test file:
+Playwright tests run via `bun run test`. To run a specific test file:
 
 ```bash
-npx playwright test test-file-name.js
+bunx playwright test test-file-name.js
 ```
 
 To run tests with a specific browser:
 
 ```bash
-npx playwright test --project=chromium
-npx playwright test --project=firefox
-npx playwright test --project=webkit
+bunx playwright test --project=chromium
+bunx playwright test --project=firefox
+bunx playwright test --project=webkit
 ```
 
 ## Code Style Guidelines
@@ -59,11 +80,15 @@ npx playwright test --project=webkit
 ### Redux/State Management
 
 - **Use pre-typed hooks** - Import `useAppDispatch` and `useAppSelector` from `src/app/hooks.ts`
-- **Do NOT import from react-redux directly** - Use typed hooks from `app/hooks.ts`
-- **createAppSlice pattern** - Use `createAppSlice()` from `src/app/createAppSlice.ts` for slices
+- **Do NOT import from react-redux directly** - Use typed hooks from `app/hooks.ts` (also enforced by ESLint)
+- **`combineSlices` pattern** - The store in `src/app/store.ts` uses `combineSlices(...)`,
+  not `combineReducers`. Add new slices there.
+- **`createAppSlice`** - Use `createAppSlice()` from `src/app/createAppSlice.ts` for slices
 - **Selector naming** - Use `select{StateName}` pattern (e.g., `selectStatus`, `selectRawText`)
 - **Action naming** - Use `set{StateName}`, `toggle{Feature}`, `reset{State}` patterns
 - **Thunk naming** - Use `verb{Feature}` pattern (e.g., `startTeleprompter`, `changeLanguage`)
+- **Store exposed for testing** - `window.__store__` is set in `store.ts` so the Redux store
+  can be driven from the browser console (see "Silent Testing" in `README.md`).
 
 ### Naming Conventions
 
@@ -94,9 +119,37 @@ import { setContent } from "./contentSlice"
 ### File Structure
 
 - `src/app/` - Redux configuration, store, hooks, thunks
-- `src/features/{featureName}/` - Feature slices and components (e.g., `content/`, `navbar/`)
-- `src/lib/` - Pure utilities and helpers (e.g., `word-tokenizer.ts`, `speech-recognizer.ts`)
+- `src/features/{featureName}/` - Feature slices and components:
+  - `content/` - `Content.tsx`, `contentSlice.ts`, `ChordProConfirmBanner.tsx`
+  - `navbar/` - `NavBar.tsx`, `navbarSlice.ts`
+  - `debug/` - `DebugPanel.tsx`, `debugSlice.ts` (work in progress; **not yet wired into the store**)
+- `src/lib/` - Pure utilities and helpers:
+  - `word-tokenizer.ts` - Splits text into `TextElement[]` (tokens vs delimiters)
+  - `speech-recognizer.ts` - Wraps the Web Speech API lifecycle
+  - `speech-matcher.ts` - Levenshtein-based matcher, advances from last position
+  - `levenshtein.ts` - Edit-distance implementation used by the matcher
+  - `markdown-processor.ts` - Renders Markdown with marked.js
+  - `html-word-injector.ts` - Injects clickable word spans into rendered HTML
 - `test/` - Playwright E2E tests
+
+### Content Processing Pipeline
+
+Text flows through several stages; keep this order in mind when changing content handling:
+
+1. **Tokenization** (`src/lib/word-tokenizer.ts`) - Splits raw text into `TextElement[]`
+2. **Markdown detection & rendering** (`src/lib/markdown-processor.ts`) - Auto-detects
+   Markdown and renders with `marked`
+3. **ChordPro detection** - On paste, `[G]`/`[C]`-style chords are detected and a confirm
+   banner (`ChordProConfirmBanner.tsx`) is shown; chords are positioned above lyrics
+4. **HTML word injection** (`src/lib/html-word-injector.ts`) - Clickable per-word spans
+5. **Rendering** (`src/features/content/Content.tsx`) - Display + scroll-to-word logic
+
+### Scrolling Behavior
+
+- **Unidirectional** - Only scrolls forward during speech; prevents jumping back on
+  recognition errors
+- **Click navigation** - Clicking a word resets the transcript index to that position
+- **Smart positioning** - Centers the active word based on the scroll-offset preference
 
 ### Error Handling
 
@@ -108,29 +161,53 @@ import { setContent } from "./contentSlice"
 ### Accessibility
 
 - **ARIA attributes** - Always include `aria-label`, `aria-expanded`, `role` where appropriate
-- **Keyboard navigation** - Ensure all interactive elements work with keyboard
+- **Keyboard navigation** - Ensure all interactive elements work with keyboard (e.g., **P** toggles play/pause)
 - **Screen reader support** - Use `is-sr-only` class for screen-reader-only text
 - **Semantic HTML** - Use `<nav>`, `<main>`, `<button>` elements correctly
 
 ### Browser APIs
 
-- **Speech Recognition** - Web Speech API (webkitSpeechRecognition)
+- **Speech Recognition** - Web Speech API (`webkitSpeechRecognition`); requires a secure
+  context (HTTPS or localhost). Will not work from `file://`.
 - **Local Storage** - Persist user preferences in localStorage
 - **File Reader API** - Handle file uploads with FileReader
 - **Check support** - Always verify browser support before using APIs
 
 ### CSS/Styling
 
+> **There is NO CSS framework installed.** Bulma is **not** a dependency, despite the
+> class names looking like Bulma. The `is-*`, `has-*`, `navbar-*`, `button`, etc. classes
+> are **hand-written SCSS** in `src/index.scss` that intentionally mimic Bulma's naming.
+> Do **not** `npm install bulma` — add new styles to `src/index.scss` (or component SCSS)
+> following the existing patterns.
+
 - **Custom styles** - Add in `src/index.scss` or component-specific SCSS
-- **Responsive design** - Use responsive modifiers (`is-hidden-mobile`, etc.)
-- **Flexbox/Grid** - Prefer utility classes over custom CSS
+- **Responsive design** - Use the existing responsive modifiers (`is-hidden-mobile`, etc.)
+- **Flexbox/Grid** - Prefer the existing utility classes over custom CSS
+
+#### PurgeCSS — read this before adding dynamic classes
+
+Production builds run PostCSS + PurgeCSS (`postcss.config.mjs`). Class names that appear
+only in JS/TS (not in static HTML) are stripped unless they match a safelist pattern.
+The safelist includes `/^is-/`, `/^final-transcript/`, `/^interim-transcript/`,
+`has-text-white`, `navbar-burger`, `navbar-menu`, `navbar-brand`, `navbar-end`,
+`is-active`, `content`, `button`, `markdown-content`, `is-sr-only`, `/^meta-info/`,
+plus standard CSS variables/keyframes/font-face.
+
+- New dynamic class names **must** either appear verbatim in the source files PurgeCSS
+  scans (`index.html`, `src/**/*.{js,ts,jsx,tsx}`, `content/**/*.md`) or be added to the
+  `safelist` in `postcss.config.mjs`, otherwise they silently disappear in production.
+- The `is-*` prefix is safelisted precisely so the Bulma-style helpers survive — keep
+  new helper classes under that prefix.
 
 ### Internationalization
 
-- **Language detection** - Auto-detect from `navigator.language`
+- **Language detection** - Auto-detect from `navigator.language`, falling back to `en-US`
 - **Persist language** - Save to localStorage as `teleprompter-language`
-- **Supported locales** - Defined in `navbarSlice.ts` as `SUPPORTED_LOCALES`
-- **Translatable content** - Use language dictionary pattern for initial text
+- **Supported locales** - 7 locales defined in `navbarSlice.ts` as `SUPPORTED_LOCALES`:
+  English (US), French (FR), German (DE), Italian (IT), Portuguese (BR), Spanish (ES), Swedish (SE)
+- **Translatable content** - Initial/placeholder text lives in the feature slices (no
+  separate `placeholder-text.ts` module exists)
 
 ### Comments and Documentation
 
@@ -140,15 +217,24 @@ import { setContent } from "./contentSlice"
 
 ### Testing
 
-- **Playwright E2E tests** - Browser automation tests in `test/` directory
+- **Playwright E2E tests** - Browser automation tests in `test/`
 - **Test structure** - Separate test files for different features
 - **Run all tests before commits** - Ensure tests pass when making changes
+
+## Build Output
+
+- The app builds to a **single HTML file** in `dist/` via `vite-plugin-singlefile` —
+  all CSS and JS is inlined.
+- `vite.config.ts` contains custom post-build plugins that strip `crossorigin` attributes
+  from inlined `<style>` tags and rewrite invalid `padding: auto` rules emitted by some
+  inlining. Keep these in mind if changing the HTML/CSS build pipeline.
+- Production minification uses Terser.
 
 ## Important Notes
 
 - This is a **single-page application** built with Vite + React
 - Uses **ESM modules** (`"type": "module"` in package.json)
-- **TypeScript strict mode** enabled - must satisfy type checker
+- **TypeScript strict mode** enabled - must satisfy the type checker
 - Development server auto-reloads on file changes
-- Build output goes to `dist/` directory
-- Speech recognition only works in **Chromium-based browsers** (Chrome, Edge)
+- Speech recognition only works reliably in **Chromium-based browsers** (Chrome, Edge);
+  the app was tested primarily in Chrome
