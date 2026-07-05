@@ -35,14 +35,13 @@ Was blind, but now I see.
       buffer: Buffer.from(markdownContent)
     });
 
-    // Open navbar menu first
-    await page.locator('button[aria-label="menu"]').click();
-
-    // Click the upload button (the menu stays open after inner-button clicks)
+    // The navbar menu starts open. Click Upload (toolbar buttons are already
+    // visible) — uploading also auto-collapses the menu to give the text room.
     await page.locator('button[title="Upload text file"]').click();
     await page.waitForTimeout(500);
 
-    // Open debug panel
+    // Reopen the (now-collapsed) menu, then open the debug panel.
+    await page.locator('button[aria-label="menu"]').click();
     await page.locator('button[aria-label="Toggle debug mode"]').click();
     await expect(page.locator('.debug-panel')).toBeVisible();
 
@@ -118,9 +117,7 @@ Amazing grace how sweet the sound`;
       buffer: Buffer.from(markdownContent)
     });
 
-    // Open navbar menu first
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open; click Upload (auto-collapses the menu).
     await page.locator('button[title="Upload text file"]').click();
     await page.waitForTimeout(500);
 
@@ -132,7 +129,8 @@ Amazing grace how sweet the sound`;
     const hasMarkdown = await page.locator('.markdown-content').count();
     console.log('Has markdown-content element:', hasMarkdown > 0);
 
-    // Open debug panel (the menu is still open from the upload)
+    // Reopen the (now-collapsed) menu, then open the debug panel.
+    await page.locator('button[aria-label="menu"]').click();
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
     // The debug panel should show the stripped text (without markdown)

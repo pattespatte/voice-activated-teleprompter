@@ -18,9 +18,7 @@ test.describe('Debug Mode - Verbose Logging', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
     await expect(page.locator('.debug-panel')).toBeVisible();
@@ -71,9 +69,7 @@ test.describe('Debug Mode - Verbose Logging', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 

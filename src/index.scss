@@ -359,6 +359,11 @@ body {
   }
 }
 
+// The toolbar menu collapses/expands with a JS-driven height animation (see
+// NavBar.tsx). CSS only provides the static states: when collapsed the menu
+// is display:none so its buttons are truly hidden (not just clipped), and
+// Playwright's isVisible() reflects that. The animation logic measures
+// scrollHeight and transitions height in a requestAnimationFrame loop.
 .navbar-menu {
   flex-basis: 100%;
   display: none;
@@ -664,16 +669,9 @@ div.content {
       right: 0;
       background-color: hsl(221, 14%, 4%);
       border-top: 1px solid hsl(221, 14%, 21%);
-      flex-direction: column;
-      align-items: stretch;
-
-      &.is-active {
-        display: flex;
-      }
-
-      &:not(.is-active) {
-        display: none;
-      }
+      // The collapse animation (max-height + overflow) is inherited from the
+      // base .navbar-menu rule; this override only repositions the menu as an
+      // overlay below the navbar on small screens.
     }
 
     .navbar-end {
@@ -786,18 +784,6 @@ div.content {
 
   .navbar-end {
     align-items: flex-start;
-  }
-}
-
-/* Ensure navbar menu toggles properly on all screen sizes */
-.navbar-menu {
-  transition: display 0.3s ease-in-out;
-
-  &:not(.is-active) {
-    visibility: hidden;
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
   }
 }
 

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
 import { startTeleprompter, stopTeleprompter, changeLanguage } from "../../app/thunks"
 import SpeechRecognizer from "../../lib/speech-recognizer"
+import { useCollapsible } from "../../lib/use-collapsible"
 
 import {
   toggleEdit,
@@ -31,12 +32,17 @@ import { toggleDebug, selectIsDebugEnabled } from "../debug/debugSlice"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  // Menu starts open so the toolbar (Edit, Upload, etc.) is visible alongside
+  // the initial placeholder text. It auto-collapses once content is loaded
+  // or edited (see handleFileUpload / handleUrlLoad / toggleEdit save path),
+  // and the user can always toggle it manually via the burger button.
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(true)
   const [isSpeechSupported, setIsSpeechSupported] = useState(true)
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [urlInput, setUrlInput] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const urlInputRef = useRef<HTMLInputElement>(null)
+  const menuRef = useCollapsible(isMobileMenuOpen)
 
   const status = useAppSelector(selectStatus)
   const fontSize = useAppSelector(selectFontSize)
@@ -74,6 +80,8 @@ export const NavBar = () => {
       const isMarkdown = file.name.toLowerCase().endsWith('.md')
       dispatch(setContent({ content, isMarkdown }))
       dispatch(resetTranscriptionIndices())
+      // Collapse the toolbar to give the freshly loaded text room.
+      setIsMobileMenuOpen(false)
     }
     reader.onerror = () => {
       if (process.env.NODE_ENV === 'development') {
@@ -100,6 +108,8 @@ export const NavBar = () => {
       const isMarkdown = pathname.endsWith('.md') || pathname.endsWith('.markdown')
       dispatch(setContent({ content, isMarkdown }))
       dispatch(resetTranscriptionIndices())
+      // Collapse the toolbar to give the freshly loaded text room.
+      setIsMobileMenuOpen(false)
       setShowUrlInput(false)
       setUrlInput("")
     } catch (err) {
@@ -107,6 +117,15 @@ export const NavBar = () => {
         console.error("Error loading URL:", err)
       }
     }
+  }
+
+  const handleToggleEdit = () => {
+    // When saving (exiting edit mode), collapse the toolbar to give the
+    // freshly edited text room. Entering edit mode leaves the menu as-is.
+    if (status === "editing") {
+      setIsMobileMenuOpen(false)
+    }
+    dispatch(toggleEdit())
   }
 
   return (
@@ -173,7 +192,7 @@ export const NavBar = () => {
         </div>
       </div>
 
-      <div className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
+      <div ref={menuRef as React.RefObject<HTMLDivElement>} className={`navbar-menu ${isMobileMenuOpen ? "is-active" : ""}`}>
         <div className="navbar-end">
           <div className={`buttons navbar-item${status === "editing" ? " editing-mode" : ""}`}>
             {status !== "started" ? (
@@ -193,7 +212,7 @@ export const NavBar = () => {
                 <button
                   type="button"
                   className={`button is-medium has-text-white ${status === "editing" ? "editing" : ""}`}
-                  onClick={() => dispatch(toggleEdit())}
+                  onClick={handleToggleEdit}
                   title="Edit"
                   aria-label="Edit text"
                 >

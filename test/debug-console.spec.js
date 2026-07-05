@@ -17,9 +17,7 @@ test.describe('Debug Mode - Console Logging', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
@@ -65,11 +63,10 @@ test.describe('Debug Mode - Console Logging', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open the debug panel first (the toggle lives inside the navbar menu, which
-    // is collapsed until the burger is clicked). Opening the burger would also
-    // stop a running teleprompter via toggleMobileMenu, so we open debug first,
-    // then start playback so the warning is shown reactively.
-    await page.locator('button[aria-label="menu"]').click();
+    // Open the debug panel. The navbar menu starts open, so the toggle is
+    // already visible. (We open the panel before starting playback because
+    // opening the burger menu would stop a running teleprompter via
+    // toggleMobileMenu — but here we don't need the burger at all.)
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
     // Start the teleprompter with the debug panel already open.
@@ -86,9 +83,7 @@ test.describe('Debug Mode - Console Logging', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 

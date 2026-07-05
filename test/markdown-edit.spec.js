@@ -8,10 +8,8 @@ test.describe('Debug Mode with Markdown (Edit Mode)', () => {
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
-    // Click Edit button
+    // The navbar menu starts open. Click Edit (the toolbar buttons are
+    // already visible) to enter edit mode.
     await page.locator('button[title="Edit"]').click();
 
     // Paste markdown content
@@ -37,14 +35,15 @@ Was blind, but now I see.
     const textarea = page.locator('textarea.content');
     await textarea.fill(markdownContent);
 
-    // Click Edit (labelled "Save" while editing) again to commit and exit edit mode.
-    // (There is no Ctrl+S binding; the Edit button toggle is the save action.)
+    // Click Edit (labelled "Save" while editing) again to commit and exit edit
+    // mode. This also auto-collapses the navbar menu (to give the text room),
+    // so the debug button below needs the menu reopened first.
     await page.locator('button[title="Edit"]').click();
     await expect(page.locator('textarea.content')).not.toBeVisible({ timeout: 3000 });
 
-    // Open debug panel (the navbar menu is still open from the initial burger click).
+    // Reopen the menu, then open the debug panel.
+    await page.locator('button[aria-label="menu"]').click();
     await page.locator('button[aria-label="Toggle debug mode"]').click();
-    await expect(page.locator('.debug-panel')).toBeVisible({ timeout: 3000 });
     await expect(page.locator('.debug-panel')).toBeVisible({ timeout: 3000 });
 
     // Check initial state
@@ -108,10 +107,7 @@ Was blind, but now I see.
     await page.goto('http://localhost:5173/');
     await page.waitForSelector('main.content-area');
 
-    // Open navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
-    // Click Edit button
+    // The navbar menu starts open; the toolbar buttons are already visible.
     await page.locator('button[title="Edit"]').click();
 
     // Type markdown content

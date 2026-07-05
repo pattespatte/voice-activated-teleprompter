@@ -10,20 +10,15 @@ test.describe('Debug Mode', () => {
   });
 
   test('should have debug toggle button in navbar', async ({ page }) => {
-    // First open the navbar menu (it's hidden by default on desktop)
-    const burgerButton = page.locator('button[aria-label="menu"]');
-    await burgerButton.click();
-
-    // Look for the debug button (bug emoji)
+    // The navbar menu starts open by default, so the debug button is already
+    // visible without toggling the burger.
     const debugButton = page.locator('button[aria-label="Toggle debug mode"]');
     await expect(debugButton).toBeVisible();
     await expect(debugButton).toHaveText(/🐛/);
   });
 
   test('should open debug panel when clicking debug button', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     const debugButton = page.locator('button[aria-label="Toggle debug mode"]');
 
     // Click the debug button
@@ -38,9 +33,7 @@ test.describe('Debug Mode', () => {
   });
 
   test('should close debug panel when clicking close button', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     const debugButton = page.locator('button[aria-label="Toggle debug mode"]');
 
     // Open debug panel
@@ -54,9 +47,7 @@ test.describe('Debug Mode', () => {
   });
 
   test('should have textarea and simulate button in debug panel', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
@@ -75,9 +66,7 @@ test.describe('Debug Mode', () => {
   });
 
   test('should be able to type in debug textarea', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
@@ -90,9 +79,7 @@ test.describe('Debug Mode', () => {
   });
 
   test('should show transcript index in debug panel', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     // Open debug panel
     await page.locator('button[aria-label="Toggle debug mode"]').click();
 
@@ -103,9 +90,7 @@ test.describe('Debug Mode', () => {
   });
 
   test('debug button should be highlighted when active', async ({ page }) => {
-    // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     const debugButton = page.locator('button[aria-label="Toggle debug mode"]');
 
     // Initially not highlighted
@@ -120,8 +105,7 @@ test.describe('Debug Mode', () => {
 
   test('should close debug panel when clicking toggle button again', async ({ page }) => {
     // First open the navbar menu
-    await page.locator('button[aria-label="menu"]').click();
-
+    // The navbar menu starts open by default.
     const debugButton = page.locator('button[aria-label="Toggle debug mode"]');
 
     // Open debug panel
