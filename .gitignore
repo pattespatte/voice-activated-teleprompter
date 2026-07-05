@@ -25,3 +25,7 @@ pnpm-debug.log*
 .playwright-mcp/
 tmp/
 test-results/
+
+# Agent/tool-generated output (regenerated on each run)
+.clavix/
+playwright-report/
