@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build output
-# dist/
+# Build output (rebuilt by the deploy workflow on every push to main)
+dist/
 
 # Logs
 logs
