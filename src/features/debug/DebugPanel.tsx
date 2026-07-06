@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import {
   toggleDebug,
@@ -107,6 +107,14 @@ export const DebugPanel = () => {
     log("Accumulated transcript cleared")
     log("=====================================")
   }
+
+  // Toggle a body class so the content area can shrink (CSS-only, no prop
+  // drilling) and leave room for the sidebar. The class is absent in
+  // production because this component is never mounted there.
+  useEffect(() => {
+    document.body.classList.toggle("debug-sidebar-open", isEnabled)
+    return () => document.body.classList.remove("debug-sidebar-open")
+  }, [isEnabled])
 
   if (!isEnabled) return null
 

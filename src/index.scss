@@ -484,6 +484,13 @@ body {
   position: relative;
 }
 
+// When the dev-only debug sidebar is open, reserve space on the right so the
+// loaded script doesn't render behind it. The sidebar is 380px wide
+// (90vw max on narrow screens). Mobile override in the responsive block.
+body.debug-sidebar-open .content-area {
+  padding-right: 380px;
+}
+
 /* NavBar styles */
 
 .navbar .title {
@@ -1225,17 +1232,24 @@ textarea:focus {
 }
 
 /* Debug panel styles */
+// Right-side, full-height sidebar. The fixed width (380px) with max-width:
+// 90vw constrains the inner textarea so it never overflows the viewport —
+// the original full-width bottom bar let the textarea stretch past the right
+// edge. Responsive fallback to a bottom bar under 768px (see media query).
 .debug-panel {
   position: fixed;
-  bottom: 0;
-  left: 0;
+  top: 0;
   right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 90vw;
   background-color: hsl(221, 14%, 21%);
-  border-top: 2px solid hsl(42, 100%, 53%);
+  border-left: 2px solid hsl(42, 100%, 53%);
   z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
-  max-height: 50vh;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .debug-panel-content {
@@ -1288,6 +1302,9 @@ textarea:focus {
 }
 
 .debug-textarea {
+  // border-box so width:100% includes the padding+border and the textarea
+  // stays within the sidebar (content-box would overflow by padding+border).
+  box-sizing: border-box;
   background-color: hsl(221, 14%, 4%);
   border: 1px solid $grey-dark;
   border-radius: 4px;
@@ -1353,8 +1370,26 @@ textarea:focus {
 
 /* Mobile responsive debug panel */
 @media screen and (max-width: 768px) {
+  // Fall back to a bottom bar on narrow screens: a 380px right sidebar would
+  // consume too much width. Revert to full width, dock to the bottom, and
+  // cap height so the loaded text stays readable above it.
   .debug-panel {
-    max-height: 40vh;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 50vh;
+    border-left: none;
+    border-top: 2px solid hsl(42, 100%, 53%);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  // No side-padding on mobile; reserve vertical space for the bottom bar.
+  body.debug-sidebar-open .content-area {
+    padding-right: 0;
+    padding-bottom: 50vh;
   }
 
   .debug-header {
