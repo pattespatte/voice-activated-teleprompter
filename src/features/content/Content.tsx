@@ -281,6 +281,16 @@ export const Content = () => {
       // Skip keyboard shortcuts when in edit mode
       if (status === "editing") return;
 
+      // Skip when the user is typing in any input/textarea (navbar URL field,
+      // debug textarea, etc.) so Space/Escape/Arrows don't hijack their input.
+      const activeElement = document.activeElement
+      const isInputFocused = activeElement && (
+        activeElement.tagName === "INPUT" ||
+        activeElement.tagName === "TEXTAREA" ||
+        activeElement.getAttribute("contenteditable") === "true"
+      )
+      if (isInputFocused) return
+
       const maxIndex = isMarkdown
         ? (containerRef.current?.querySelectorAll('[data-word-index]').length || 0) - 1
         : textElements.length - 1;
