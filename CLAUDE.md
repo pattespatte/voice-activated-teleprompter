@@ -44,6 +44,8 @@ Redux is configured in `/src/app/store.ts` using `combineSlices`. There are two 
    - Font size, scroll offset preferences
    - Language selection (7 languages supported)
    - Translation settings
+   - `urlLoadError` - last error from a URL load (button or `?content=` param); `null` = no error.
+     Surfaced by `UrlLoadErrorBanner.tsx` (`role="alert"`, dismissable via `setUrlLoadError(null)`).
 
 2. **`contentSlice`** (`/src/features/content/contentSlice.ts`) - Content and speech state
    - Raw text content
@@ -58,11 +60,18 @@ The core innovation is a robust speech-to-text matching algorithm that handles m
 
 - **`SpeechRecognizer`** (`/src/lib/speech-recognizer.ts`) - Wraps Web Speech API, handles lifecycle
 - **`SpeechMatcher`** (`/src/lib/speech-matcher.ts`) - Uses Levenshtein distance to match spoken words to text, continuing from last recognized position rather than resetting
-- **Thunks** (`/src/app/thunks.ts`) - Async operations for starting/stopping recognition
+- **Thunks** (`/src/app/thunks.ts`) - Async operations for starting/stopping recognition, and `loadContentFromUrl`
+  (shared by the "Load from URL" button and the `?content=<url>` auto-load path; returns
+  `Promise<string | null>` — `null` on success, an error string on failure)
 
-### Content Processing Pipeline
+### Content Sources & Processing Pipeline
 
-Text flows through multiple processing stages:
+Content enters via manual edit, file upload, or URL load (the `loadContentFromUrl` thunk,
+also triggered by a `?content=<url>` query param on page load). URL loads validate the
+scheme is `http(s)`, infer markdown from the pathname (`.md`/`.markdown`), and dispatch
+`setContent` + `resetTranscriptionIndices`; failures dispatch `setUrlLoadError`.
+
+Text then flows through multiple processing stages:
 
 1. **Tokenization** (`/src/lib/word-tokenizer.ts`) - Splits text into `TextElement[]` (words vs delimiters)
 2. **Markdown Detection** - Auto-detects markdown, processes with marked.js if needed
@@ -96,7 +105,8 @@ Browser language detection with localStorage persistence. The translated initial
 
 - `/src/main.tsx` - React entry point with Redux provider
 - `/src/App.tsx` - Main component, keyboard shortcuts (P key for play/pause)
-- `/src/features/navbar/NavBar.tsx` - Controls and settings UI
+- `/src/features/navbar/NavBar.tsx` - Controls and settings UI; also handles the `?content=<url>` auto-load on mount
+- `/src/features/navbar/UrlLoadErrorBanner.tsx` - Dismissable error banner for failed URL loads (`role="alert"`)
 - `/src/features/content/Content.tsx` - Text display and scrolling logic
 - `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection; also handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.) positioned above lyrics
 - `/src/features/content/ChordProConfirmBanner.tsx` - Paste-detection banner that confirms ChordPro conversion

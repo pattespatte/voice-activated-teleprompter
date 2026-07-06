@@ -25,6 +25,11 @@ Changes made to the original version of [Voice-Activated Teleprompter](https://g
 - Unidirectional scrolling (prevents jumping back on recognition errors)
 - Keyboard shortcut for play/pause (P key)
 - File upload support for importing scripts
+- Load content directly from a URL — either via the "Load from URL" button, or
+  automatically by appending `?content=<url>` to the page URL (e.g.
+  `/?content=https://example.com/song.md`). Markdown (`.md`/`.markdown`) is detected
+  from the URL. The link is shareable and bookmarkable; load failures surface a
+  dismissable error banner.
 - Swedish language support
 - PostCSS with PurgeCSS for optimized builds
 - Redux store exposed on `window.__store__` for silent testing via browser console

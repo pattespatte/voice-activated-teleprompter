@@ -11,6 +11,8 @@ export interface NavBarSliceState {
   scrollOffset: number
   language: string
   showChords: boolean
+  // Last error from a URL load (button or ?content= param). null = no error.
+  urlLoadError: string | null
 }
 
 export const SUPPORTED_LOCALES = {
@@ -54,6 +56,7 @@ const initialState: NavBarSliceState = {
   scrollOffset: 100,
   language: detectLanguage(),
   showChords: true,
+  urlLoadError: null,
 }
 
 export const navbarSlice = createAppSlice({
@@ -112,6 +115,12 @@ export const navbarSlice = createAppSlice({
     toggleChords: create.reducer(state => {
       state.showChords = !state.showChords
     }),
+
+    setUrlLoadError: create.reducer(
+      (state, action: PayloadAction<string | null>) => {
+        state.urlLoadError = action.payload
+      },
+    ),
   }),
 
   selectors: {
@@ -124,6 +133,7 @@ export const navbarSlice = createAppSlice({
     selectScrollOffset: state => state.scrollOffset,
     selectLanguage: state => state.language,
     selectShowChords: state => state.showChords,
+    selectUrlLoadError: state => state.urlLoadError,
   },
 })
 
@@ -140,6 +150,7 @@ export const {
   setScrollOffset,
   setLanguage,
   toggleChords,
+  setUrlLoadError,
 } = navbarSlice.actions
 
 export const {
@@ -152,4 +163,5 @@ export const {
   selectScrollOffset,
   selectLanguage,
   selectShowChords,
+  selectUrlLoadError,
 } = navbarSlice.selectors

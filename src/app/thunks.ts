@@ -1,13 +1,68 @@
 import type { AppThunk } from "./store"
-import { start, stop } from "../features/navbar/navbarSlice"
+import {
+  start,
+  stop,
+  setUrlLoadError,
+} from "../features/navbar/navbarSlice"
 import {
   setFinalTranscriptIndex,
   setInterimTranscriptIndex,
+  setContent,
+  resetTranscriptionIndices,
 } from "../features/content/contentSlice"
 import SpeechRecognizer from "../lib/speech-recognizer"
 import { computeSpeechRecognitionTokenIndex } from "../lib/speech-matcher"
 
 let speechRecognizer: SpeechRecognizer | null = null
+
+/**
+ * Fetches text content from a URL and loads it into the teleprompter.
+ * Shared by the "Load from URL" button and the `?content=` query-param path.
+ *
+ * Validates the scheme is http(s), fetches, infers markdown from the pathname,
+ * and dispatches `setContent` + `resetTranscriptionIndices`. On any failure
+ * (bad scheme, HTTP non-2xx, CORS/network), dispatches `setUrlLoadError` with
+ * a friendly message.
+ *
+ * @returns the error string on failure, or `null` on success — so callers
+ *   (the button) can branch on the result without a racy selector read.
+ */
+export const loadContentFromUrl =
+  (url: string): AppThunk<Promise<string | null>> =>
+  async dispatch => {
+    // Clear any previous error on a fresh attempt.
+    dispatch(setUrlLoadError(null))
+
+    if (!/^https?:\/\//i.test(url)) {
+      const msg = "URL must start with http:// or https://"
+      dispatch(setUrlLoadError(msg))
+      return msg
+    }
+
+    try {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const content = await response.text()
+      const pathname = new URL(url).pathname.toLowerCase()
+      const isMarkdown =
+        pathname.endsWith(".md") || pathname.endsWith(".markdown")
+      dispatch(setContent({ content, isMarkdown }))
+      dispatch(resetTranscriptionIndices())
+      return null
+    } catch (err) {
+      // fetch() throws a TypeError on network/CORS failures; its message is
+      // uselessly generic ("Failed to fetch"), so translate it.
+      const isNetwork =
+        err instanceof TypeError && /fetch|network/i.test(err.message)
+      const msg = isNetwork
+        ? "Could not load — the source may block cross-origin requests (CORS), or the host is unreachable."
+        : err instanceof Error
+          ? err.message
+          : "Unknown error loading URL."
+      dispatch(setUrlLoadError(msg))
+      return msg
+    }
+  }
 
 // Accumulate recent recognized words for more robust matching.
 // Chrome's continuous mode delivers short chunks; without context,

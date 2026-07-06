@@ -86,7 +86,10 @@ bunx playwright test --project=webkit
 - **`createAppSlice`** - Use `createAppSlice()` from `src/app/createAppSlice.ts` for slices
 - **Selector naming** - Use `select{StateName}` pattern (e.g., `selectStatus`, `selectRawText`)
 - **Action naming** - Use `set{StateName}`, `toggle{Feature}`, `reset{State}` patterns
-- **Thunk naming** - Use `verb{Feature}` pattern (e.g., `startTeleprompter`, `changeLanguage`)
+- **Thunk naming** - Use `verb{Feature}` pattern (e.g., `startTeleprompter`, `changeLanguage`, `loadContentFromUrl`).
+  Async thunks that callers branch on return a typed promise — see `loadContentFromUrl`,
+  which returns `Promise<string | null>` (`null` = success, error string = failure) so
+  callers don't need a racy selector read.
 - **Store exposed for testing** - `window.__store__` is set in `store.ts` so the Redux store
   can be driven from the browser console (see "Silent Testing" in `README.md`).
 
@@ -121,7 +124,7 @@ import { setContent } from "./contentSlice"
 - `src/app/` - Redux configuration, store, hooks, thunks
 - `src/features/{featureName}/` - Feature slices and components:
   - `content/` - `Content.tsx`, `contentSlice.ts`, `ChordProConfirmBanner.tsx`
-  - `navbar/` - `NavBar.tsx`, `navbarSlice.ts`
+  - `navbar/` - `NavBar.tsx`, `navbarSlice.ts`, `UrlLoadErrorBanner.tsx`
   - `debug/` - `DebugPanel.tsx`, `debugSlice.ts` (dev tool for simulating speech input)
 - `src/lib/` - Pure utilities and helpers:
   - `word-tokenizer.ts` - Splits text into `TextElement[]` (tokens vs delimiters)
@@ -132,17 +135,32 @@ import { setContent } from "./contentSlice"
   - `html-word-injector.ts` - Injects clickable word spans into rendered HTML
 - `test/` - Playwright E2E tests
 
+### Content Sources
+
+Content enters the app via three paths that all funnel into the same slice actions:
+
+- **Manual edit** - Paste/type into the content area (Edit mode)
+- **File upload** - File input (`NavBar`) reads via `FileReader`
+- **URL load** - The `loadContentFromUrl` thunk (`src/app/thunks.ts`) is shared by the
+  "Load from URL" button **and** the `?content=<url>` query-param auto-load path. It
+  validates the scheme is `http(s)`, fetches, infers markdown from the pathname
+  (`.md`/`.markdown`), and dispatches `setContent` + `resetTranscriptionIndices`. On any
+  failure (bad scheme, HTTP non-2xx, CORS/network) it dispatches `setUrlLoadError`, which
+  `UrlLoadErrorBanner.tsx` surfaces as a dismissable `role="alert"` banner. The query
+  param stays in the address bar on success (shareable/bookmarkable).
+
 ### Content Processing Pipeline
 
 Text flows through several stages; keep this order in mind when changing content handling:
 
-1. **Tokenization** (`src/lib/word-tokenizer.ts`) - Splits raw text into `TextElement[]`
-2. **Markdown detection & rendering** (`src/lib/markdown-processor.ts`) - Auto-detects
+1. **Ingestion** - One of the sources above populates `rawText` in `contentSlice`
+2. **Tokenization** (`src/lib/word-tokenizer.ts`) - Splits raw text into `TextElement[]`
+3. **Markdown detection & rendering** (`src/lib/markdown-processor.ts`) - Auto-detects
    Markdown and renders with `marked`
-3. **ChordPro detection** - On paste, `[G]`/`[C]`-style chords are detected and a confirm
+4. **ChordPro detection** - On paste, `[G]`/`[C]`-style chords are detected and a confirm
    banner (`ChordProConfirmBanner.tsx`) is shown; chords are positioned above lyrics
-4. **HTML word injection** (`src/lib/html-word-injector.ts`) - Clickable per-word spans
-5. **Rendering** (`src/features/content/Content.tsx`) - Display + scroll-to-word logic
+5. **HTML word injection** (`src/lib/html-word-injector.ts`) - Clickable per-word spans
+6. **Rendering** (`src/features/content/Content.tsx`) - Display + scroll-to-word logic
 
 ### Scrolling Behavior
 
@@ -197,6 +215,8 @@ plus standard CSS variables/keyframes/font-face.
 - New dynamic class names **must** either appear verbatim in the source files PurgeCSS
   scans (`index.html`, `src/**/*.{js,ts,jsx,tsx}`, `content/**/*.md`) or be added to the
   `safelist` in `postcss.config.mjs`, otherwise they silently disappear in production.
+  (The `.url-load-error-*` classes introduced for URL loading are safe: they appear
+  verbatim in `UrlLoadErrorBanner.tsx` + `index.scss`, so PurgeCSS keeps them.)
 - The `is-*` prefix is safelisted precisely so the Bulma-style helpers survive — keep
   new helper classes under that prefix.
 

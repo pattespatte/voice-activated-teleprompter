@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { NavBar } from "./features/navbar/NavBar"
+import { UrlLoadErrorBanner } from "./features/navbar/UrlLoadErrorBanner"
 import { Content } from "./features/content/Content"
 import { ChordProConfirmBanner } from "./features/content/ChordProConfirmBanner"
 // Dev-only: the import is statically eliminated in production by the
@@ -66,6 +67,7 @@ const App = () => {
     <div className="app">
       <NavBar />
       <ChordProConfirmBanner />
+      <UrlLoadErrorBanner />
       {import.meta.env.DEV && <DebugPanel />}
       <Content />
     </div>

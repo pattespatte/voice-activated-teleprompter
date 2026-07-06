@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 
-import { startTeleprompter, stopTeleprompter, changeLanguage } from "../../app/thunks"
+import { startTeleprompter, stopTeleprompter, changeLanguage, loadContentFromUrl } from "../../app/thunks"
 import SpeechRecognizer from "../../lib/speech-recognizer"
 import { useCollapsible } from "../../lib/use-collapsible"
 
@@ -69,6 +69,18 @@ export const NavBar = () => {
     setIsSpeechSupported(Boolean(recognizer.getIsSupported()))
   }, [])
 
+  // On mount, check for a `?content=<url>` query parameter and auto-load it.
+  // The URL stays in the address bar (shareable/bookmarkable). On success the
+  // navbar collapses to give the loaded text room; on failure the error banner
+  // surfaces and the menu stays open so the user can retry manually.
+  useEffect(() => {
+    const contentUrl = new URLSearchParams(window.location.search).get("content")
+    if (!contentUrl) return
+    dispatch(loadContentFromUrl(contentUrl)).then(error => {
+      if (!error) setIsMobileMenuOpen(false)
+    })
+  }, [dispatch])
+
   const toggleMobileMenu = () => {
     // Stop the teleprompter if it's currently playing
     if (status === "started") {
@@ -108,23 +120,13 @@ export const NavBar = () => {
     const url = urlInput.trim()
     if (!url) return
 
-    try {
-      const response = await fetch(url)
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      const content = await response.text()
-      const pathname = new URL(url).pathname.toLowerCase()
-      const isMarkdown = pathname.endsWith('.md') || pathname.endsWith('.markdown')
-      dispatch(setContent({ content, isMarkdown }))
-      dispatch(resetTranscriptionIndices())
-      // Collapse the toolbar to give the freshly loaded text room.
-      setIsMobileMenuOpen(false)
-      setShowUrlInput(false)
-      setUrlInput("")
-    } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("Error loading URL:", err)
-      }
-    }
+    const error = await dispatch(loadContentFromUrl(url))
+    if (error) return // The error banner surfaces the message; keep menu open.
+
+    // Success: collapse the toolbar and reset the URL field.
+    setIsMobileMenuOpen(false)
+    setShowUrlInput(false)
+    setUrlInput("")
   }
 
   const handleToggleEdit = () => {
