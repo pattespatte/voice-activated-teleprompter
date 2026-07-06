@@ -75,8 +75,15 @@ Text then flows through multiple processing stages:
 
 1. **Tokenization** (`/src/lib/word-tokenizer.ts`) - Splits text into `TextElement[]` (words vs delimiters)
 2. **Markdown Detection** - Auto-detects markdown, processes with marked.js if needed
-3. **HTML Word Injection** (`/src/lib/html-word-injector.ts`) - Injects clickable word spans into rendered HTML
-4. **Rendering** (`/src/features/content/Content.tsx`) - Displays content with scroll-to-word logic
+3. **ChordPro directives** (`/src/lib/markdown-processor.ts`, `stripChordProDirectives`) -
+   Only `title` and structural section labels (`{start_of_chorus}`, `{start_of_verse}`,
+   `{start_of_bridge}`, …) render as headers in the reading view. All other metadata
+   (`subtitle`, `comment`, `key`, `time`, `composer`, `year`, …) is **hidden** from the
+   reading view and surfaced in the ℹ metadata popover instead. `comment` collects every
+   occurrence; other keys keep the first value.
+4. **HTML Word Injection** (`/src/lib/html-word-injector.ts`) - Injects clickable word spans into rendered HTML
+5. **Rendering** (`/src/features/content/Content.tsx`) - Displays content with scroll-to-word logic;
+   also renders the ℹ metadata popover (hidden directives + YAML/ChordPro frontmatter)
 
 ### Scrolling Algorithm
 
@@ -108,7 +115,7 @@ Browser language detection with localStorage persistence. The translated initial
 - `/src/features/navbar/NavBar.tsx` - Controls and settings UI; also handles the `?content=<url>` auto-load on mount
 - `/src/features/navbar/UrlLoadErrorBanner.tsx` - Dismissable error banner for failed URL loads (`role="alert"`)
 - `/src/features/content/Content.tsx` - Text display and scrolling logic
-- `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection; also handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.) positioned above lyrics
+- `/src/lib/markdown-processor.ts` - Markdown rendering with word span injection; also handles [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation ([G], [C], etc.) positioned above lyrics. Directive routing: only `title` + section labels render; `subtitle`/`comment`/`key`/`time`/etc. are popover-only (see `stripChordProDirectives` + `METADATA_DIRECTIVES`)
 - `/src/features/content/ChordProConfirmBanner.tsx` - Paste-detection banner that confirms ChordPro conversion
 
 ### Language Support Note

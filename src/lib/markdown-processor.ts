@@ -301,6 +301,10 @@ const parseKwargs = (src: string): Record<string, string> => {
  * Parses ChordPro directives from content into a key-value object.
  * Supports both {key: value} and {key value} forms.
  * Meta directives like {meta: source_url http://...} are flattened to meta_source_url.
+ *
+ * Most metadata keys keep the first value found. `comment` is the exception: it
+ * collects every occurrence (newline-joined) so mid-song performance cues are
+ * not lost when hidden from the reading view.
  */
 export const parseChordProDirectives = (content: string): Record<string, string> => {
   const meta: Record<string, string> = {}
@@ -326,7 +330,13 @@ export const parseChordProDirectives = (content: string): Record<string, string>
           meta[normalizedKey] = metaValue
         }
       } else if (trimmedLabel && isMetadataDirective(directive)) {
-        if (!meta[directive]) {
+        if (directive === 'comment') {
+          // Comments can appear multiple times (top-of-file frontmatter plus
+          // mid-song performance cues). Collect all of them so nothing is lost.
+          meta.comment = meta.comment
+            ? `${meta.comment}\n${trimmedLabel}`
+            : trimmedLabel
+        } else if (!meta[directive]) {
           meta[directive] = trimmedLabel
         }
       }
@@ -338,10 +348,13 @@ export const parseChordProDirectives = (content: string): Record<string, string>
 
 /**
  * Directives whose argument is surfaced as song metadata in the info popover.
+ * Note: `comment` collects every occurrence (newline-joined); other keys keep
+ * the first value.
  */
 const METADATA_DIRECTIVES = new Set([
   'title',
   'subtitle',
+  'comment',
   'artist',
   'arranger',
   'composer',
@@ -410,10 +423,15 @@ const ENVIRONMENT_DEFAULT_LABELS: Record<string, string> = {
 /**
  * Strips ChordPro directives from content, routing each to a display behavior:
  *
- * - SHOW: title, subtitle, comment, environment labels → markdown headers
- * - SILENT: metadata, fonts, page/layout, chord diagrams → consumed, not shown
+ * - SHOW: title, environment labels → markdown headers
+ * - SILENT: subtitle, comment, metadata, fonts, page/layout, chord diagrams
+ *          → consumed, not shown in the reading view (surfaced in the ℹ popover
+ *          via parseChordProDirectives instead)
  * - ACT: chorus (replay last chorus), column_break/new_page (horizontal rule)
  * - IGNORE: x_* custom directives → dropped without warning (per spec)
+ *
+ * Only `title` and the structural section labels (chorus/verse/bridge/...) are
+ * rendered as headers. All other metadata is popover-only.
  *
  * No directive should ever leak raw `{...}` text to the display.
  */
@@ -445,19 +463,15 @@ const stripChordProDirectives = (content: string): string => {
     const { label } = parseDirectiveArgument(value)
     const trimmedLabel = label.trim()
 
-    // --- SHOW: title, subtitle, comment ---
+    // --- SHOW: title (only metadata-style directive that renders as a header) ---
     if (directive === 'title' && trimmedLabel) {
       result.push(`# ${trimmedLabel}`)
       continue
     }
-    if (directive === 'subtitle' && trimmedLabel) {
-      result.push(`## ${trimmedLabel}`)
-      continue
-    }
-    if (directive === 'comment' && trimmedLabel) {
-      result.push(`## ${trimmedLabel}`)
-      continue
-    }
+
+    // subtitle and comment fall through to SILENT below: they are popover-only
+    // (see parseChordProDirectives). Environment section labels (chorus/verse/
+    // bridge/...) are structural and still render as headers:
 
     // --- SHOW: environment openers ---
     if (isEnvironmentOpener(directive)) {

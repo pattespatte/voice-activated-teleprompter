@@ -21,7 +21,10 @@ Changes made to the original version of [Voice-Activated Teleprompter](https://g
 - A more mobile friendly layout
 - TypeScript rewrite
 - Markdown support for teleprompter content
-- [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation support (e.g., `[G]`, `[C]`) positioned above lyrics
+- [ChordPro](https://www.chordpro.org/chordpro/chordpro-chords/) notation support (e.g., `[G]`, `[C]`) positioned above lyrics.
+  The reading view shows the song title, section headers (verse/chorus/bridge), and lyrics;
+  all other frontmatter (`subtitle`, `key`, `composer`, `comment`, etc.) is collected into a
+  dismissable ℹ metadata popover in the top-right corner.
 - Unidirectional scrolling (prevents jumping back on recognition errors)
 - Keyboard shortcut for play/pause (P key)
 - File upload support for importing scripts

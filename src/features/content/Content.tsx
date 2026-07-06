@@ -364,6 +364,14 @@ export const Content = () => {
                   <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{" "}
                   {key === "source" ? (
                     <a href={value} target="_blank" rel="noopener noreferrer">{value}</a>
+                  ) : key === "comment" && value.includes("\n") ? (
+                    <span className="meta-info-list">
+                      {value.split("\n").map((line, i) => (
+                        <span key={i} className="meta-info-list-item">
+                          {line}
+                        </span>
+                      ))}
+                    </span>
                   ) : (
                     value
                   )}

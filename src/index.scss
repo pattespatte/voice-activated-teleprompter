@@ -678,6 +678,15 @@ input[type="range"] {
       color: hsl(42, 100%, 53%);
     }
   }
+
+  .meta-info-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-info-list-item {
+    display: block;
+  }
 }
 
 .content {

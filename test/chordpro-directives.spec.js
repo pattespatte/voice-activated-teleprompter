@@ -28,6 +28,16 @@ const uploadMarkdown = async (page, content, filename = 'test.md') => {
   await page.waitForSelector('.markdown-content')
 }
 
+/**
+ * Open the metadata popover and return its visible text. Assumes the popover
+ * button is present (i.e. the content has metadata).
+ */
+const getPopoverText = async (page) => {
+  await page.locator('.meta-info-button').click()
+  await page.waitForSelector('.meta-info-popover')
+  return page.locator('.meta-info-popover').textContent()
+}
+
 test.describe('ChordPro Directive Support', () => {
   test('label="..." argument renders as just the label text', async ({ page }) => {
     await page.goto('http://localhost:5173/')
@@ -265,8 +275,13 @@ lyrics
     await uploadMarkdown(page, content)
 
     const html = await page.locator('.markdown-content').innerHTML()
-    expect(html).toMatch(/Alto note here/)
+    // comment is popover-only now — must NOT render in the reading view
+    expect(html).not.toMatch(/Alto note here/)
     expect(html).not.toContain('{comment-alto')
+
+    // ...but it surfaces in the metadata popover (selector postfix stripped → "comment")
+    const popoverText = await getPopoverText(page)
+    expect(popoverText).toMatch(/Alto note here/)
   })
 
   test('amazing-grace.md fixture renders clean (long-form tags)', async ({ page }) => {
@@ -297,9 +312,10 @@ And [G]grace my [D]fears relieved
 
     const html = await page.locator('.markdown-content').innerHTML()
 
-    // Title and subtitle
+    // Title renders; subtitle/comment/metadata are popover-only (not in reading view)
     expect(html).toMatch(/Amazing Grace/)
-    expect(html).toMatch(/Traditional Hymn/)
+    expect(html).not.toMatch(/Traditional Hymn/)
+    expect(html).not.toMatch(/Originally titled/)
 
     // Labeled sections
     expect(html).toMatch(/Refrain/)
@@ -316,5 +332,46 @@ And [G]grace my [D]fears relieved
     // Chords rendered (ruby elements)
     expect(html).toContain('ruby')
     expect(html).toContain('rt>')
+
+    // The hidden metadata (subtitle, composer, year, comment) is in the popover
+    const popoverText = await getPopoverText(page)
+    expect(popoverText).toMatch(/Traditional Hymn/)
+    expect(popoverText).toMatch(/John Newton/)
+    expect(popoverText).toMatch(/1779/)
+    expect(popoverText).toMatch(/Originally titled/)
+  })
+
+  test('subtitle and comment are hidden from content but shown in metadata popover', async ({ page }) => {
+    await page.goto('http://localhost:5173/')
+    await page.waitForSelector('main.content-area')
+
+    const content = `{title: Title Shows}
+{subtitle: Hidden Subtitle}
+{comment: Hidden Cue One}
+lyrics here
+{comment: Mid-song cue}
+more lyrics
+`
+    await uploadMarkdown(page, content)
+
+    const html = await page.locator('.markdown-content').innerHTML()
+
+    // Title renders in the reading view
+    expect(html).toMatch(/Title Shows/)
+
+    // subtitle and comment do NOT render in the reading view
+    expect(html).not.toMatch(/Hidden Subtitle/)
+    expect(html).not.toMatch(/Hidden Cue One/)
+    expect(html).not.toMatch(/Mid-song cue/)
+
+    // Raw directive text never leaks
+    expect(html).not.toContain('{subtitle')
+    expect(html).not.toContain('{comment')
+
+    // Both surface in the popover; multiple comments are collected (not truncated)
+    const popoverText = await getPopoverText(page)
+    expect(popoverText).toMatch(/Hidden Subtitle/)
+    expect(popoverText).toMatch(/Hidden Cue One/)
+    expect(popoverText).toMatch(/Mid-song cue/)
   })
 })

@@ -158,7 +158,15 @@ Text flows through several stages; keep this order in mind when changing content
 3. **Markdown detection & rendering** (`src/lib/markdown-processor.ts`) - Auto-detects
    Markdown and renders with `marked`
 4. **ChordPro detection** - On paste, `[G]`/`[C]`-style chords are detected and a confirm
-   banner (`ChordProConfirmBanner.tsx`) is shown; chords are positioned above lyrics
+   banner (`ChordProConfirmBanner.tsx`) is shown; chords are positioned above lyrics.
+   ChordPro **directives** are routed by `stripChordProDirectives` in
+   `src/lib/markdown-processor.ts`: only `title` and the structural section labels
+   (`{start_of_chorus}`, `{start_of_verse}`, `{start_of_bridge}`, …) render as headers
+   in the reading view. Every other metadata directive — `subtitle`, `comment`, `key`,
+   `time`, `composer`, `year`, `capo`, etc. — is **silent** (consumed, not shown) and
+   surfaced instead in the ℹ metadata popover (`Content.tsx`, via
+   `parseAllMetadata`/`parseChordProDirectives`). `comment` collects every occurrence
+   (frontmatter + mid-song cues) into the popover; other keys keep the first value.
 5. **HTML word injection** (`src/lib/html-word-injector.ts`) - Clickable per-word spans
 6. **Rendering** (`src/features/content/Content.tsx`) - Display + scroll-to-word logic
 
