@@ -1,33 +1,49 @@
 {title: Amazing Grace}
 {key: G}
 {time: 3/4}
+{subtitle: Traditional Hymn}
+{composer: John Newton}
+{year: 1779}
+{comment: Originally titled "Faith's Review and Expectation"}
 
-{c: Verse 1}
-[G]Amazing [G7]grace! How [C]sweet the [G]sound
-[C]That [G]saved a wretch like [G]me!
-[G]I [D]once was [D7]lost, but [G]now am [G7]found;
-[C]Was [G]blind, but [G7]now I [C]see. [G]
+{start_of_chorus: Refrain}
+[G]Amazing [G7]grace, how [C]sweet the [G]sound
+That [G]saved a wretch like [D]me
+[G]I once was [G7]lost, but [C]now am [G]found
+Was [G]blind, but [D]now I [G]see
+{end_of_chorus}
 
-{c: Verse 2}
-[G]'Twas [G7]grace that [C]taught my [G]heart to fear,
-[G]And [G7]grace my [C]fears re-[G]lieved;
-[G]How [D]precious [D7]did that [G]grace ap-[G7]pear
-[C]The [G]hour I [G7]first be-[C]lieved. [G]
+{start_of_verse: label="Verse 1"}
+[G]'Twas [G7]grace that [C]taught my [G]heart to fear
+And [G]grace my [D]fears relieved
+[G]How [G7]precious [C]did that [G]grace appear
+The [G]hour I [D]first be-[G]lieved
+{end_of_verse}
 
-{c: Verse 3}
-[G]The [G7]Lord has [C]promised [G]good to me,
-[C]His [G]word my [G7]hope se-[C]cures; [G]
+{start_of_verse: label="Verse 2"}
+[G]Through [G7]many [C]dangers, [G]toils and snares
+I [G]have already [D]come
+[G]'Tis [G7]grace hath [C]brought me [G]safe thus far
+And [G]grace will [D]lead me [G]home
+{end_of_verse}
+
+{start_of_verse: label="Verse 3"}
+[G]The [G7]Lord has [C]promised [G]good to me
+His [G]word my hope se-[D]cures
 [G]He [G7]will my [C]shield and [G]portion be
-[Em]As [D7]long as [G]life endures.
+As [Em]long as [D]life en-[G]dures
+{end_of_verse}
 
-{c: Verse 4}
-[G]Through [G7]many [C]dangers, [G]toils and snares,
-[C]I [G]have al-[G7]ready [C]come; [G]
-[G]'Tis [G7]grace hath [C]brought me [G]safe thus far,
-[Em]And [D7]grace will [G]lead me home.
-
-{c: Verse 5}
-[G]When [G7]we've been [C]there ten [G]thousand years,
-[C]Bright [G]shining as the [G7]sun, [C] [G]
+{start_of_verse: label="Verse 4"}
+[G]When we've been [G7]there ten [C]thousand [G]years
+Bright [G]shining as the [D]sun
 [G]We've [G7]no less [C]days to [G]sing God's praise
-[Em]Than [D7]when we'd [G]first begun.
+Than [G]when we [D]first be-[G]gun
+{end_of_verse}
+
+{start_of_chorus: Refrain}
+[G]Amazing [G7]grace, how [C]sweet the [G]sound
+That [G]saved a wretch like [D]me
+[G]I once was [G7]lost, but [C]now am [G]found
+Was [G]blind, but [D]now I [G]see
+{end_of_chorus}
