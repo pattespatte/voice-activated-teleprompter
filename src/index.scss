@@ -169,6 +169,59 @@ $cyan: hsl(198, 100%, 70%);
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  // Color modifiers (Bulma-style names, hand-rolled — no Bulma dependency).
+  // Solid background + dark text for strong contrast on the dark debug panel.
+  &.is-info {
+    background-color: $cyan;
+    border-color: $cyan;
+    color: $black;
+
+    &:hover:not(:disabled) {
+      background-color: hsl(198, 100%, 60%);
+      border-color: hsl(198, 100%, 60%);
+      color: $black;
+    }
+  }
+
+  &.is-success {
+    background-color: $green;
+    border-color: $green;
+    color: $black;
+
+    &:hover:not(:disabled) {
+      background-color: hsl(153, 53%, 43%);
+      border-color: hsl(153, 53%, 43%);
+      color: $black;
+    }
+  }
+
+  &.is-warning {
+    background-color: $yellow;
+    border-color: $yellow;
+    color: $black;
+
+    &:hover:not(:disabled) {
+      background-color: hsl(42, 100%, 43%);
+      border-color: hsl(42, 100%, 43%);
+      color: $black;
+    }
+  }
+
+  // Outlined neutral variant for secondary actions on dark backgrounds
+  // (e.g. the debug sidebar). The base .button's $grey-dark text is near-
+  // invisible on the dark panel (~2:1 contrast); this raises it well above AA.
+  &.is-light {
+    background-color: transparent;
+    border-color: $grey-lighter;
+    color: $grey-lighter;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: $white;
+      color: $white;
+    }
+  }
 }
 
 // Form controls

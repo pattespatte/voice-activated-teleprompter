@@ -182,7 +182,7 @@ Example: Amazing grace how sweet the sound"
             </button>
             <button
               type="button"
-              className="button is-small"
+              className="button is-small is-light"
               onClick={() => dispatch(setDebugTranscript(""))}
             >
               Clear Input
