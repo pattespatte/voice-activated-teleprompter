@@ -28,7 +28,11 @@ import {
 } from "./navbarSlice"
 
 import { resetTranscriptionIndices, updateInitialTextForLanguage, setContent } from "../content/contentSlice"
-import { toggleDebug, selectIsDebugEnabled } from "../debug/debugSlice"
+// Dev-only: the debug slice is conditionally registered in the store and the
+// button below is DEV-gated, so toggleDebug is never reachable in production.
+// A small amount of action-creator code survives in the single-file bundle
+// (vite-plugin-singlefile inlines async chunks), but no debug UI ships.
+import { toggleDebug } from "../debug/debugSlice"
 
 export const NavBar = () => {
   const dispatch = useAppDispatch()
@@ -53,7 +57,11 @@ export const NavBar = () => {
   // const verticallyFlipped = useAppSelector(selectVerticallyFlipped)
   const language = useAppSelector(selectLanguage)
   const showChords = useAppSelector(selectShowChords)
-  const isDebugEnabled = useAppSelector(selectIsDebugEnabled)
+  // The debug slice is dev-only (tree-shaken from production builds), so guard
+  // the selector against the slice being absent. Always false in production.
+  const isDebugEnabled = useAppSelector(state =>
+    import.meta.env.DEV && state.debug ? state.debug.isEnabled : false
+  )
 
   useEffect(() => {
     // Check if speech recognition is supported
@@ -322,18 +330,20 @@ export const NavBar = () => {
               </>
             ) : null}
 
-            <button
-              type="button"
-              className={`button is-medium ${isDebugEnabled ? "is-warning" : "has-text-grey"}`}
-              onClick={() => dispatch(toggleDebug())}
-              title={isDebugEnabled ? "Hide debug panel" : "Show debug panel"}
-              aria-label="Toggle debug mode"
-            >
-              <span className="icon">
-                🐛
-              </span>
-              <span className="is-hidden-mobile">{isDebugEnabled ? "Debug On" : "Debug"}</span>
-            </button>
+            {import.meta.env.DEV && (
+              <button
+                type="button"
+                className={`button is-medium ${isDebugEnabled ? "is-warning" : "has-text-grey"}`}
+                onClick={() => dispatch(toggleDebug())}
+                title={isDebugEnabled ? "Hide debug panel" : "Show debug panel"}
+                aria-label="Toggle debug mode"
+              >
+                <span className="icon">
+                  🐛
+                </span>
+                <span className="is-hidden-mobile">{isDebugEnabled ? "Debug On" : "Debug"}</span>
+              </button>
+            )}
           </div>
 
           {status === "stopped" ? (

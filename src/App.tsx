@@ -2,6 +2,8 @@ import { useEffect } from "react"
 import { NavBar } from "./features/navbar/NavBar"
 import { Content } from "./features/content/Content"
 import { ChordProConfirmBanner } from "./features/content/ChordProConfirmBanner"
+// Dev-only: the import is statically eliminated in production by the
+// `import.meta.env.DEV` guard on <DebugPanel /> below.
 import { DebugPanel } from "./features/debug/DebugPanel"
 import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { startTeleprompter, stopTeleprompter } from "./app/thunks"
@@ -64,7 +66,7 @@ const App = () => {
     <div className="app">
       <NavBar />
       <ChordProConfirmBanner />
-      <DebugPanel />
+      {import.meta.env.DEV && <DebugPanel />}
       <Content />
     </div>
   )

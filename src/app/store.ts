@@ -3,11 +3,16 @@ import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { navbarSlice } from "../features/navbar/navbarSlice"
 import { contentSlice } from "../features/content/contentSlice"
+// Tree-shaken out of the production bundle: the debug slice is dev-only.
+// `import.meta.env.DEV` is statically replaced by Vite (true in dev, false in
+// prod), so Rollup drops both the import and the array element in production.
 import { debugSlice } from "../features/debug/debugSlice"
+
+const devSlices = import.meta.env.DEV ? [debugSlice] : []
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(navbarSlice, contentSlice, debugSlice)
+const rootReducer = combineSlices(navbarSlice, contentSlice, ...devSlices)
 
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>
