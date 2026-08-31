@@ -617,8 +617,22 @@ const processForDisplay = (content: string): string => {
   return stripChordProDirectives(stripFrontmatter(content))
 }
 
-const CHORD_REGEX = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add|6|11|13)?(?:\/[A-G][#b]?)?\]/
-const CHORD_REGEX_GLOBAL = /\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add|6|11|13)?(?:\/[A-G][#b]?)?\]/g
+// Chord symbol grammar for ChordPro inline chords: [G], [Cmaj7], [F#m7],
+// [F#m7b5], [Bb6/9], [D7(9)/A]. Declared as a source string so the finder,
+// global and strip regexes built from it cannot drift apart. Qualities and
+// extensions may combine in any order (m+7 = m7, maj+7 = maj7, 7+sus4 =
+// 7sus4, 7+"-9" = 7b9 …). Bracketed words like [Chorus] never match: after
+// the required A–G root, only the token alternation below (plus parens or a
+// slash bass) can follow, and no English word is composed solely of it.
+const CHORD_SOURCE =
+  '[A-G][#b]{0,2}' +
+  '(?:maj|Maj|min|dim|aug|sus2|sus4|sus|add|alt|m|M|13|11|9|7|6|5|4|2|b5|#5|b9|#9|#11|b13|\\+|-)*' +
+  '(?:\\([^()\\s]*\\))*' +
+  '(?:\\/(?:[A-G][#b]{0,2}|\\d{1,2}))?'
+
+const CHORD_REGEX = new RegExp('\\[' + CHORD_SOURCE + '\\]')
+const CHORD_REGEX_GLOBAL = new RegExp('\\[' + CHORD_SOURCE + '\\]', 'g')
+const CHORD_STRIP_REGEX = new RegExp('\\[' + CHORD_SOURCE + '\\]', 'g')
 
 /**
  * Processes chords in ChordPro inline format [G]word.
@@ -716,7 +730,7 @@ export const stripMarkdown = (content: string): string => {
     .replace(/^\s*\d+\.\s+/gm, '')        // Numbered list markers
     .replace(/^>\s+/gm, '')               // Blockquotes
     // Remove chord notations
-    .replace(/\[[A-G][#b]?(?:maj|min|dim|aug|m|M|7|9|sus|add|6|11|13)?(?:\/[A-G][#b]?)?\]/g, '')
+    .replace(CHORD_STRIP_REGEX, '')
     // Clean up extra whitespace
     .replace(/\n{3,}/g, '\n\n')
     .trim()
