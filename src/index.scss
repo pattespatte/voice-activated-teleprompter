@@ -12,6 +12,13 @@ $yellow: hsl(42, 100%, 53%);
 $green: hsl(153, 53%, 53%);
 $cyan: hsl(198, 100%, 70%);
 
+// Border-box everywhere so width: 100% + padding can never overflow a container
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 // Utility classes
 
 // Background colors
@@ -349,12 +356,15 @@ textarea {
 html,
 body {
   height: 100vh;
+  // dvh follows mobile browser toolbars; browsers without support keep 100vh
+  height: 100dvh;
   overflow: hidden;
   margin: 0;
 }
 
 .app {
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -697,7 +707,18 @@ input[type="range"] {
   width: 100%;
   height: 100%;
   color: hsl(221, 14%, 100%);
-  padding: 0;
+  // Font size and horizontal margin come from the navbar sliders as custom
+  // properties (set inline in Content.tsx). Inline font-size/padding would
+  // override every responsive rule in this file; variables keep the sliders
+  // authoritative while letting CSS stay in charge of layout.
+  font-size: var(--content-font-size, 30px);
+  // The margin may never shrink the text column below ~5.5em of the chosen
+  // font size: lyric paragraphs carry a 2em hanging indent (see
+  // .markdown-content p), and words with chords render inside <ruby> bases,
+  // which do not word-break — so continuation lines need ~2em + 3.5em of
+  // room before the margin is allowed to eat into the column.
+  // (em resolves against this element's font-size, i.e. the slider value.)
+  padding-inline: min(var(--content-margin, 10px), calc((100% - 5.5em) / 2));
   line-height: inherit;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -822,12 +843,7 @@ div.content {
 
   .content-area {
     height: calc(100vh - 60px);
-  }
-
-  .content {
-    font-size: 16px;
-    line-height: 1.5;
-    padding: 0.5rem;
+    height: calc(100dvh - 60px);
   }
 }
 
@@ -868,11 +884,6 @@ div.content {
       }
     }
   }
-
-  .content {
-    font-size: 14px;
-    padding: 0.25rem;
-  }
 }
 
 input[type="range"] {
@@ -900,7 +911,6 @@ input[type="range"] {
 /* Improved mobile content styles */
 @media screen and (max-width: 768px) {
   .content {
-    padding: 1rem;
     word-break: break-word;
     -webkit-hyphens: auto;
     -moz-hyphens: auto;
@@ -932,8 +942,6 @@ input[type="range"] {
 
 @media screen and (max-width: 480px) {
   .content {
-    padding: 0.75rem;
-
     >span {
       margin: 0.1em 0.02em;
       font-size: 0.95em;
@@ -959,7 +967,7 @@ input[type="range"] {
     font-size: 16px;
     /* Prevents zoom on iOS */
     line-height: 1.5;
-    padding: 0.75rem;
+    padding: 0.75rem min(var(--content-margin, 10px), calc((100% - 5.5em) / 2));
   }
 }
 
@@ -988,6 +996,7 @@ input[type="range"] {
 
   .content-area {
     height: calc(100vh - 50px);
+    height: calc(100dvh - 50px);
   }
 }
 
@@ -1137,6 +1146,13 @@ textarea:focus {
     }
   }
 
+  /* Media never overflows the column */
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
   /* Code */
   code {
     background-color: hsl(221, 14%, 21%);
@@ -1193,6 +1209,10 @@ textarea:focus {
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
+    // Block display with horizontal scroll keeps wide tables from stretching
+    // the page; tables that fit render as before.
+    display: block;
+    overflow-x: auto;
 
     th,
     td {
@@ -1227,7 +1247,14 @@ textarea:focus {
   p {
     margin: 0.3em 0;
     color: hsl(221, 14%, 100%);
-    white-space: pre;
+    // pre-wrap preserves source spacing within a line but lets long lines
+    // soft-wrap instead of overflowing the viewport. Chords ride on <ruby>
+    // elements, so they stay attached to their words across wraps.
+    white-space: pre-wrap;
+    // Hanging indent: soft-wrapped continuation lines start inset so a visual
+    // row reads as a continuation of the lyric line above, not a new line.
+    padding-left: 2em;
+    text-indent: -2em;
     line-height: 1.3;
   }
 

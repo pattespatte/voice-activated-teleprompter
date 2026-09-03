@@ -18,6 +18,14 @@ export default {
         // Keep patterns that might be dynamically added
         /^--/,
         /^is-/,
+        // Markdown-generated element selectors: these elements only exist in
+        // dangerouslySetInnerHTML output, never in the scanned source files,
+        // so purgecss would strip their rules from production builds
+        'h1',
+        'pre',
+        'table',
+        'img',
+        'video',
         'has-text-white',
         'has-background-black',
         'navbar-burger',

@@ -662,6 +662,19 @@ const processChords = (content: string): string => {
       return `<ruby>${word}<rt>${chordText}</rt></ruby>`
     }
 
+    // Chord cluster with no following word: emit one ruby per chord instead
+    // of a single joined annotation. Ruby text is laid out on a single line
+    // by spec and cannot wrap, so a joined "<rt>C / G7 / D / Eb</rt>" is an
+    // unbreakable block that overflows narrow viewports at large font sizes.
+    const emitPendingChordRubys = (): string => {
+      const rubys = pendingChords
+        .map(chord => `<ruby>\u2003<rt>${chord}</rt></ruby>`)
+        .join(' ')
+      pendingChords.length = 0
+      hasChords = true
+      return rubys
+    }
+
     while (remaining.length > 0) {
       const match = remaining.match(CHORD_REGEX)
 
@@ -672,7 +685,7 @@ const processChords = (content: string): string => {
           if (wordMatch) {
             result += emitRuby(wordMatch[1]) + wordMatch[2]
           } else {
-            result += emitRuby(' ')
+            result += emitPendingChordRubys()
           }
         } else {
           result += remaining
@@ -704,7 +717,7 @@ const processChords = (content: string): string => {
 
     // Handle trailing chords at end of line
     if (pendingChords.length > 0) {
-      result += emitRuby(' ')
+      result += emitPendingChordRubys()
     }
 
     processedLines.push(hasChords ? `<span class="has-chords">${result}</span>` : line)

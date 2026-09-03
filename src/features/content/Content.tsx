@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react"
 import { escape } from "html-escaper"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { setContent, setFinalTranscriptIndex, setInterimTranscriptIndex } from "./contentSlice"
@@ -44,11 +44,15 @@ export const Content = () => {
   const isMarkdown = useAppSelector(selectIsMarkdown)
   const processedHtml = useAppSelector(selectProcessedHtml)
 
+  // Slider values are passed as CSS custom properties (consumed by the
+  // .content rule in index.scss). Inline font-size/padding would override
+  // every responsive rule in the stylesheet; custom properties keep the
+  // sliders authoritative while letting CSS stay in charge of layout.
   const style = {
-    fontSize: `${fontSize}px`,
-    padding: `0 ${margin}px`,
+    '--content-font-size': `${fontSize}px`,
+    '--content-margin': `${margin}px`,
     lineHeight: '1.3',
-  }
+  } as CSSProperties
 
   const containerRef = useRef<null | HTMLDivElement>(null)
   const lastRef = useRef<null | HTMLDivElement>(null)
