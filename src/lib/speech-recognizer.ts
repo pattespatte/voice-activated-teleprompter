@@ -4,18 +4,32 @@ type SubscriberFunction = (
 ) => void
 
 export default class SpeechRecognizer {
-  private recognizer: SpeechRecognition
+  private recognizer: SpeechRecognition | null = null
   private subscribers: SubscriberFunction[] = []
   private shouldListen: Boolean = false
 
   constructor(language: string = "en-US") {
-    this.recognizer = new webkitSpeechRecognition()
+    // Feature-detect the Web Speech API: constructing the recognizer throws
+    // a ReferenceError in browsers that do not implement it (e.g. Firefox).
+    const SpeechRecognitionCtor: typeof SpeechRecognition | undefined =
+      typeof SpeechRecognition !== "undefined"
+        ? SpeechRecognition
+        : typeof webkitSpeechRecognition !== "undefined"
+          ? webkitSpeechRecognition
+          : undefined
 
-    this.recognizer.lang = language
-    this.recognizer.continuous = true
-    this.recognizer.interimResults = true
+    if (SpeechRecognitionCtor === undefined) {
+      return
+    }
 
-    this.recognizer.onresult = e => {
+    const recognizer = new SpeechRecognitionCtor()
+    this.recognizer = recognizer
+
+    recognizer.lang = language
+    recognizer.continuous = true
+    recognizer.interimResults = true
+
+    recognizer.onresult = e => {
       let final_transcript = ""
       let interim_transcript = ""
 
@@ -35,19 +49,25 @@ export default class SpeechRecognizer {
       }
     }
 
-    this.recognizer.onend = () => {
+    recognizer.onend = () => {
       if (this.shouldListen) {
-        this.recognizer.start()
+        recognizer.start()
       }
     }
   }
 
   start(): void {
+    if (this.recognizer === null) {
+      return
+    }
     this.shouldListen = true
     this.recognizer.start()
   }
 
   stop(): void {
+    if (this.recognizer === null) {
+      return
+    }
     this.shouldListen = false
     this.recognizer.stop()
   }
@@ -57,6 +77,9 @@ export default class SpeechRecognizer {
   }
 
   setLanguage(language: string): void {
+    if (this.recognizer === null) {
+      return
+    }
     const wasListening = this.shouldListen
     if (wasListening) {
       this.stop()
@@ -65,5 +88,9 @@ export default class SpeechRecognizer {
     if (wasListening) {
       this.start()
     }
+  }
+
+  getIsSupported(): boolean {
+    return this.recognizer !== null
   }
 }
