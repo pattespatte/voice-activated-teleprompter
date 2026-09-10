@@ -75,6 +75,17 @@ export const Content = () => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (status === "editing") return;
 
+      // Skip when an input element has focus (e.g. the toolbar sliders) so
+      // the keystroke keeps its native behavior instead of jumping around
+      // the transcript.
+      const activeElement = document.activeElement;
+      const isInputFocused =
+        activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          activeElement.getAttribute("contenteditable") === "true");
+      if (isInputFocused) return;
+
       const maxIndex = textElements.length - 1;
 
       if (event.code === "Escape") {
