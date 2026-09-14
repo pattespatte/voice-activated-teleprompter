@@ -713,10 +713,9 @@ input[type="range"] {
   // authoritative while letting CSS stay in charge of layout.
   font-size: var(--content-font-size, 30px);
   // The margin may never shrink the text column below ~5.5em of the chosen
-  // font size: lyric paragraphs carry a 2em hanging indent (see
-  // .markdown-content p), and words with chords render inside <ruby> bases,
-  // which do not word-break — so continuation lines need ~2em + 3.5em of
-  // room before the margin is allowed to eat into the column.
+  // font size: words with chords render inside <ruby> bases, which do not
+  // word-break, so lines need ~3.5em of room before the margin is allowed
+  // to eat into the column (5.5em keeps headroom above that minimum).
   // (em resolves against this element's font-size, i.e. the slider value.)
   padding-inline: min(var(--content-margin, 10px), calc((100% - 5.5em) / 2));
   line-height: inherit;
@@ -1010,7 +1009,7 @@ textarea:focus {
 }
 
 /* High contrast mode support */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .navbar {
     border-bottom: 2px solid hsl(221, 14%, 100%);
   }
@@ -1251,10 +1250,6 @@ textarea:focus {
     // soft-wrap instead of overflowing the viewport. Chords ride on <ruby>
     // elements, so they stay attached to their words across wraps.
     white-space: pre-wrap;
-    // Hanging indent: soft-wrapped continuation lines start inset so a visual
-    // row reads as a continuation of the lyric line above, not a new line.
-    padding-left: 2em;
-    text-indent: -2em;
     line-height: 1.3;
   }
 
